@@ -1,13 +1,28 @@
 #Summer 2020 CSCI 4210 Operating Systems project 1
 import sys #get argument
 
+class process(object):
+	"""docstring for process"""
+	def __init__(self, arg):
+		self.pid = arg[0]
+		self.arrival = arg[1]
+		self.burst_time = arg[2]
+		self.num_burst = arg[3]
+		self.io = arg[4]
+		self.wait_time = [0]*arg[3]
+		self.turnaround_times = [0]*arg[3]
+		self.count = 0
+		self.location = "NULL"
+
+
+
 #main part
 if __name__ == '__main__':
 	if len(sys.argv) != 8:
 		print("ERROR: Invalid argument.")
 		sys.exit(2)
 
-	number_process = int(sys.argv[1])
+	num_process = int(sys.argv[1])
 	seed = float(sys.argv[2])
 	parameter = float(sys.argv[3])
 	upper_bound = float(sys.argv[4])
