@@ -1,7 +1,6 @@
 #Summer 2020 CSCI 4210 Operating Systems project 1
 #Team Members: Zhaoxi Sun, Xinyan Sun, Tongyu Wang, Yueting Liao
 import sys #get argument
-#test git hub hello
 
 class process(object):
 	"""docstring for process"""
