@@ -8,12 +8,11 @@ class process(object):
 	def __init__(self, arg):
 		self.pid = arg[0]
 		self.arrival = arg[1]
-		self.burst_time = arg[2]
-		self.num_burst = arg[3]
-		self.io = arg[4]
+		self.seed = arg[2]
+		self.lambda = arg[3]
+		self.upper_bound = arg[4]
 		self.wait_time = [0]*arg[3]
-		self.turnaround_times = [0]*arg[3]
-		self.count = 0
+		self.alpha = [0]*arg[3]
 		self.location = "NULL"
 
 
@@ -24,11 +23,11 @@ if __name__ == '__main__':
 		print("ERROR: Invalid argument.")
 		sys.exit(2)
 
-	num_process = int(sys.argv[1])
+	arrival = int(sys.argv[1])
 	seed = float(sys.argv[2])
 	parameter = float(sys.argv[3])
 	upper_bound = float(sys.argv[4])
-	tcs = float(sys.argv[5])
+	t_cs = float(sys.argv[5])
 	alpha = float(sys.argv[6])
-	tslice = float(sys.argv[7])
+	t_slice = float(sys.argv[7])
 	rradd = float(sys.argv[8])
