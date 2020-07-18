@@ -9,15 +9,17 @@ class Process():
         self.total_bursts = len(burst_times)
         assert len(burst_times) == len(io_times) + 1
         # Computed Variables
-        self.turnaround_times = []
-        self.waiting_times = []
+        self.turnaround_times = [] # [(start_time, end_time), (start_time, end_time), ...]
+        self.waiting_times = [] # [(start_time, end_time), (start_time, end_time), ...]
         # Status can be: "IO", "Ready", "Running", "Context_Swtich_In" and "Context_Switch_Out"
         self.status = None
+        # i-th CPU burst we are now in
         self.index = 0
         # tmp Variables
         self.cpu_start_timestamp = -1
         self.cpu_end_timestamp = -1
     
+    # You can add getters to fill your needs
     def getArrivalTime(self):
         return self.arrival_time
 
@@ -30,7 +32,7 @@ class Process():
     # Process arrives, and gets added to the ready queue
     # Modifies: Adds a new tuple to waiting_times; Changes status to "Ready"
     # Returns： Nothing
-    def arrive(self, time):
+    def arrive(self):
         pass
     
     # Start Context Switch into CPU
