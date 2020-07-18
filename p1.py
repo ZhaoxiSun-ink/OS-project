@@ -43,11 +43,11 @@ if __name__ == '__main__':
 	for x in range(n):
 		pid = letters[x]
 		temp = checkUpperBound(upper_bound)
-		arr = -(math.log(temp)) / parameter
+		arr = math.floor(-(math.log(temp)) / parameter)
 		num_burst = math.floor(checkUpperBound(upper_bound)*100)+1
 		burst = []
 		io = []
-		for y in range(num_burst-2):
+		for y in range(num_burst-1):
 			a = checkUpperBound(upper_bound)
 			b = checkUpperBound(upper_bound)
 			burst.append(math.ceil(-(math.log(a)) / parameter))

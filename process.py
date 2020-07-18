@@ -30,7 +30,7 @@ class Process():
         return self.status
     
     def print(self):
-        print("Process {} has {} CPU bursts.".format(self.name, self.total_bursts))
+        print("Process {} has {} CPU bursts, and arrvies at {}.".format(self.name, self.total_bursts, self.arrival_time))
         for i in range(self.total_bursts-1):
             print("Burst {} has a time {}, remains time {}, and IO time {}.".format(i, self.burst_times[i], self.remaining_burst_times[i], self.io_times[i]))
         print("Last Burst has a time {}, and remains time {}.".format(self.burst_times[self.total_bursts-1], self.remaining_burst_times[self.total_bursts-1]))
