@@ -1,6 +1,5 @@
 import math
 
-
 class Rand48(object):
     def __init__(self, seed):
         self.n = seed
@@ -13,14 +12,3 @@ class Rand48(object):
         return self.n
     def drand(self):
         return self.next() / 2**48
-    def lrand(self):
-        return self.next() >> 17
-    def mrand(self):
-        n = self.next() >> 16
-        if n & (1 << 31):
-            n -= 1 << 32
-        return n   
-    
-temp = Rand48(20)
-temp.srand(20)
-print(temp.drand())
