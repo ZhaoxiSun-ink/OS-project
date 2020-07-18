@@ -9,6 +9,16 @@ from rand48 import Rand48
 letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
            'R','S','T','U','V','W','X','Y','Z']
 
+#check upper_bound
+def checkUpperBound(upper):
+	while(True):
+		temp = generator.drand()
+		if(temp > upper):
+			continue
+		else:
+			return temp
+
+
 #main part
 if __name__ == '__main__':
 	if len(sys.argv) != 9:
@@ -32,15 +42,15 @@ if __name__ == '__main__':
 	
 	for x in range(n):
 		pid = letters[x]
-		temp = generator.drand()
+		temp = checkUpperBound(upper_bound)
 		arr = -(math.log(temp)) / parameter
-		num_burst = math.floor(generator.drand())+1
+		num_burst = math.floor(checkUpperBound(upper_bound)*100)+1
 		burst = []
 		io = []
 		for y in range(num_burst-2):
-			burst.append(math.ceil(generator.drand()))
-			io.append(math.ceil(generator.drand()))
-		burst.append(math.ceil(generator.drand()))
+			burst.append(math.ceil(checkUpperBound(upper_bound)))
+			io.append(math.ceil(checkUpperBound(upper_bound)))
+		burst.append(math.ceil(checkUpperBound(upper_bound)))
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 		
