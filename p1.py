@@ -11,12 +11,12 @@ letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
 
 #main part
 if __name__ == '__main__':
-	if len(sys.argv) != 8:
+	if len(sys.argv) != 9:
 		print("ERROR: Invalid argument.")
 		sys.exit(2)
 
 	n = int(sys.argv[1])
-	seed = float(sys.argv[2])
+	seed = int(sys.argv[2])
 	parameter = float(sys.argv[3])
 	upper_bound = float(sys.argv[4])
 	t_cs = float(sys.argv[5])
@@ -44,3 +44,5 @@ if __name__ == '__main__':
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 		
+	for process in processes:
+		process.print()

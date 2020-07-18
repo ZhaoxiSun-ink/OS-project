@@ -1,5 +1,5 @@
 class Process():
-    def __init__(self, name: String, arrival_time: int, burst_times: list, io_times: list):
+    def __init__(self, name, arrival_time: int, burst_times: list, io_times: list):
         # Variables received from outside
         self.name = name
         self.arrival_time = arrival_time
@@ -28,6 +28,13 @@ class Process():
 
     def getStatus(self):
         return self.status
+    
+    def print(self):
+        print("Process {} has {} CPU bursts.".format(self.name, self.total_bursts))
+        for i in range(total_bursts-1):
+            print("Burst {} has a time {}, remains time {}, and IO time {}.".format(i, self.burst_times[i], self.remaining_burst_times[i], io_times[i]))
+        print("Last Burst has a time {}, and remains time {}.".format(self.burst_times[total_bursts-1], self.remaining_burst_times[total_bursts-1]))
+        print("Process is at burst {} and has status {}.".format(self.index, self.status))
     
     # Process arrives, and gets added to the ready queue
     # Modifies: Adds a new tuple to waiting_times; Changes status to "Ready"
@@ -72,7 +79,7 @@ class Process():
     # Modifies: Adds a new tuple to waiting_times (start waiting timer); Changes status to "Ready"
     # Modifies: Reduce remaining_burst_times[index] by milliseconds already spent running in CPU
     def preempt(self, time):
-        assert self.status = "Context_Switch_Out"
+        assert self.status == "Context_Switch_Out"
         self.status = "Ready"
         self.waiting_times.append((time, -1))
         self.remaining_burst_times[index] -= cpu_start_timestamp - cpu_end_timestamp
@@ -82,7 +89,7 @@ class Process():
     # Modifies: Changes status to "IO"; Find last tuple in turnaround_times (stop turnaround timer)
     # Returns: Expected end time of IO, -1 if process already ended
     def finishRunning(self, time):
-        assert self.status = "Context_Switch_Out"
+        assert self.status == "Context_Switch_Out"
         self.status = "IO"
         turnaround_time_start_timestamp = self.turnaround_times[len(self.turnaround_times) - 1][0]
         self.turnaround_times[len(self.turnaround_times) - 1] = (turnaround_time_start_timestamp, time)
@@ -96,7 +103,7 @@ class Process():
     # Modifies: Increases index by 1
     # Returns: Nothing
     def finishIO(self, time):
-        assert self.status = "IO"
+        assert self.status == "IO"
         self.status = "waiting"
         self.waiting_times.append((time, -1))
         self.index += 1
