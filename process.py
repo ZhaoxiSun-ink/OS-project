@@ -31,9 +31,11 @@ class Process():
     
     # Process arrives, and gets added to the ready queue
     # Modifies: Adds a new tuple to waiting_times; Changes status to "Ready"
-    # Returns： Nothing
+    # Returns: Nothing
     def arrive(self):
-        pass
+        assert self.status == None
+        self.waiting_times.append((arrival_time, -1))
+        self.status == "Ready"
     
     # Start Context Switch into CPU
     # Requires: Process must be at "Ready" status
@@ -41,42 +43,63 @@ class Process():
     # Modifies: Find last tuple in waiting_times (end waiting timer) and update
     # Returns: Nothing
     def startContextSwitchIn(self, time):
-        pass
+        assert self.status == "Ready"
+        waiting_time_start_timestamp = self.waiting_times[len(self.waiting_times)-1][0]
+        self.waiting_times[len(self.waiting_times)-1] = (waiting_time_start_timestamp, time)
+        self.turnaround_times.append((time, -1))
+        self.status == "Context_Switch_In"
 
     # Process enters CPU for CPU burst
     # Requires: Process must be at "Context_Switch_In" status
     # Modifies: Changes status to "Running"
     # Returns: Expected end time of current CPU burst
     def startRunning(self, time):
-        pass
+        assert self.status == "Context_Switch_In"
+        self.status = "Running"
+        self.cpu_start_timestamp = time
+        return remaining_burst_times[index]
 
     # Start Context Switch out of CPU
     # Requires: Process must be at "Running" status
     # Modifies: Changes status to "Context_Switch_Out"
     def startContextSwitchOut(self, time):
-        pass
+        assert self.status == "Running"
+        self.status = "Context_Switch_Out"
+        self.cpu_end_timestamp = time
 
     # Process leaves running state.
     # Requires: Process must be at "Context_Switch_Out" status
     # Modifies: Adds a new tuple to waiting_times (start waiting timer); Changes status to "Ready"
     # Modifies: Reduce remaining_burst_times[index] by milliseconds already spent running in CPU
     def preempt(self, time):
-        pass
+        assert self.status = "Context_Switch_Out"
+        self.status = "Ready"
+        self.waiting_times.append((time, -1))
+        self.remaining_burst_times[index] -= cpu_start_timestamp - cpu_end_timestamp
 
     # Process finishes CPU burst.
     # Requires: Process must be at "Context_Switch_Out" status
-    # Modifies: Changes status to "IO"
+    # Modifies: Changes status to "IO"; Find last tuple in turnaround_times (stop turnaround timer)
     # Returns: Expected end time of IO, -1 if process already ended
     def finishRunning(self, time):
-        pass
+        assert self.status = "Context_Switch_Out"
+        self.status = "IO"
+        turnaround_time_start_timestamp = self.turnaround_times[len(self.turnaround_times) - 1][0]
+        self.turnaround_times[len(self.turnaround_times) - 1] = (turnaround_time_start_timestamp, time)
+        if index == total_bursts - 1:
+            return -1
+        return io_times[index]
 
     # Process finishes IO and enters ready queue
     # Requires: Process must be at "IO" status
     # Modifies: Adds a new tuple to waiting_times (start waiting timer); Change status to "waiting"
+    # Modifies: Increases index by 1
     # Returns: Nothing
     def finishIO(self, time):
-        pass
-
+        assert self.status = "IO"
+        self.status = "waiting"
+        self.waiting_times.append((time, -1))
+        self.index += 1
 
 if __name__ == "__main__":
     n = "Process"
