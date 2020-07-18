@@ -31,9 +31,9 @@ class Process():
     
     def print(self):
         print("Process {} has {} CPU bursts.".format(self.name, self.total_bursts))
-        for i in range(total_bursts-1):
+        for i in range(self.total_bursts-1):
             print("Burst {} has a time {}, remains time {}, and IO time {}.".format(i, self.burst_times[i], self.remaining_burst_times[i], io_times[i]))
-        print("Last Burst has a time {}, and remains time {}.".format(self.burst_times[total_bursts-1], self.remaining_burst_times[total_bursts-1]))
+        print("Last Burst has a time {}, and remains time {}.".format(self.burst_times[self.total_bursts-1], self.remaining_burst_times[self.total_bursts-1]))
         print("Process is at burst {} and has status {}.".format(self.index, self.status))
     
     # Process arrives, and gets added to the ready queue
