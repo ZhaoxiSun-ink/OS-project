@@ -48,11 +48,12 @@ if __name__ == '__main__':
 		burst = []
 		io = []
 		for y in range(num_burst-2):
-			burst.append(math.ceil(checkUpperBound(upper_bound)))
-			io.append(math.ceil(checkUpperBound(upper_bound)))
-		burst.append(math.ceil(checkUpperBound(upper_bound)))
-		print(burst)
-		print(io)
+			a = checkUpperBound(upper_bound)
+			b = checkUpperBound(upper_bound)
+			burst.append(math.ceil(-(math.log(a)) / parameter))
+			io.append(math.ceil(-(math.log(b)) / parameter))
+		c = checkUpperBound(upper_bound)
+		burst.append(math.ceil(-(math.log(c)) / parameter))
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 		
