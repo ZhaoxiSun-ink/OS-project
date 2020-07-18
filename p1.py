@@ -51,6 +51,8 @@ if __name__ == '__main__':
 			burst.append(math.ceil(checkUpperBound(upper_bound)))
 			io.append(math.ceil(checkUpperBound(upper_bound)))
 		burst.append(math.ceil(checkUpperBound(upper_bound)))
+		print(burst)
+		print(io)
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 		
