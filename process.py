@@ -1,5 +1,5 @@
 class Process():
-    def __init__(self, name, arrival_time, burst_times, io_times):
+    def __init__(self, name: String, arrival_time: int, burst_times: list, io_times: list):
         # Variables received from outside
         self.name = name
         self.arrival_time = arrival_time
