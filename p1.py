@@ -1,9 +1,10 @@
 #Summer 2020 CSCI 4210 Operating Systems project 1
 #Team Members: Zhaoxi Sun, Xinyan Sun, Tongyu Wang, Yueting Liao
 import sys #get argument
-
+from rand48 import Rand48
+"""
 class process(object):
-	"""docstring for process"""
+	# docstring for process
 	def __init__(self, arg):
 		self.pid = arg[0]
 		self.arrival = arg[1]
@@ -30,3 +31,8 @@ if __name__ == '__main__':
 	alpha = float(sys.argv[6])
 	t_slice = float(sys.argv[7])
 	rradd = float(sys.argv[8])
+"""
+
+generator = Rand48(0)
+generator.srand(20)
+print(generator.drand())

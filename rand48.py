@@ -12,3 +12,4 @@ class Rand48(object):
         return self.n
     def drand(self):
         return self.next() / 2**48
+        
