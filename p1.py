@@ -6,6 +6,7 @@ from process import Process#get process class
 from copy import deepcopy
 from rand48 import Rand48
 from queue import PriorityQueue
+from collections import deque
 
 #global variable
 letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
@@ -35,7 +36,7 @@ def SJF(processes):
 
 def SRT(processes):
 	pass
-
+		
 def RR(processes):
 	pass
 
