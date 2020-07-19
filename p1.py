@@ -3,6 +3,7 @@
 import sys #get argument
 import math # get log
 from process import Process#get process class
+from copy import deepcopy
 from rand48 import Rand48
 from queue import PriorityQueue
 
