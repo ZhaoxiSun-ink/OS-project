@@ -99,28 +99,7 @@ def FCFS(processes, cst):
 		else:
 			print("Something went wrong")
 			return
-	# Compute total times
-	# Average burst time
-	bursts_sum = 0
-	total_burst_time = 0
-	for process in processes:
-		process.print()
-		bursts_sum += process.getTotalBursts()
-		total_burst_time += process.getTotalBurstTime()
-	print("--Average burst time is: {}".format(total_burst_time/bursts_sum))
-	# Average wait time
-	total_wait_time = 0
-	for process in processes:
-		total_wait_time += process.getTotalWaitingTime()
-	print("--Average wait time is: {}".format(total_wait_time/len(processes)))
-	# Average turnaround time
-	total_turnaround_time = 0
-	for process in processes:
-		total_turnaround_time += process.getTotalTurnaroundTime()
-	print("--Average turnaround time is: {}".format(total_turnaround_time/bursts_sum))
-	# Average 
-	print("Context Switches: {}".format(context_switch_count))
-	
+
 
 
 # Shortest Job First (SJF) algorithm
@@ -129,7 +108,7 @@ def FCFS(processes, cst):
 #arg line - python3 p1.py 5 2 0.05 256 4 0.5 128 3
 #   tau i+1 =  alpha x t i   +  (1-alpha) x tau i
 def SJF(processes):
-    print("SJF\n")
+    # preprocessing, caculating tau (estimated_brust_time)
     tau_0 = (1/parameter) # For every process, tau_0 = 1/lambda
     ready_queue = list()
     for process in processes:
@@ -140,18 +119,38 @@ def SJF(processes):
             estimated_brust_time.append(tau_i)
         process.setEstimatedBurstTime(estimated_brust_time)
     #waiting_queue, sorted by arrival time
-    processes.sort(key=lambda p: p.arrival_time)
+    process_table = dict()
+    waiting_queue = list()
+    event_queue = PriorityQueue()
+    time = 0
+    current_running = None
+    CPU_vacant_at = -1
+    # push all processes to event_queue
     for process in processes:
-        print("Process Name: {} | arrival_time {}".format(process.name, process.getArrivalTime()) )
-        ready_queue.append(process)
-        while ready_queue:
-            ready_queue.sort(key=lambda p: p.estimated_brust_time[0])
-            process_to_running = ready_queue.pop(0)
-            print(process_to_running.name)
-
-    processes.sort(key=lambda p: p.estimated_brust_time[0])
-    #print("Process Name: {} | estimated_brust_time {}".format(process.name, process.estimated_brust_time[0]) )
-
+        arrival_time = process.getArrivalTime()
+        name = process.getName()
+        event_queue.put((arrival_time, (name, "Arrive")))
+        process_table[name] = process
+        print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), tau_0 ))
+    print("time 0ms: Simulator started for SJF [Q <empty>]")
+    while( len(process_table) > 0 ):
+        next_event = event_queue.get()
+        time = next_event[0]
+        process_name = next_event[1][0]
+        event_type = next_event[1][1]
+        process = process_table[process_name]
+        if event_type == "Arrive":
+            process.arrive()
+            waiting_queue.append(process_name)
+            print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, waiting_queue))
+            if len(waiting_queue) != 0 and (current_running == None or time >= CPU_vacant_at):
+                waiting_queue.pop(0)
+                event_queue.put((time + cst, (process_name, "Run")))
+                process.startContextSwitchIn(time)
+                current_running = process_name
+                print(current_running)
+        elif event_type == "Run":
+            print(1)
 def SRT(processes):
 	pass
 
@@ -212,5 +211,4 @@ if __name__ == '__main__':
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
-#FCFS(processes1)
 SJF(processes2)
