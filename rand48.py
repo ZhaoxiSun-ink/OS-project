@@ -1,6 +1,6 @@
 """
 Author: Dietrich Epp from stack overflow
-Reference: 
+Reference:
 https://stackoverflow.com/questions/7287014/is-there-any-drand48-equivalent-in-python-or-a-wrapper-to-it
 """
 class Rand48(object):
@@ -15,4 +15,3 @@ class Rand48(object):
         return self.n
     def drand(self):
         return self.next() / 2**48
-        

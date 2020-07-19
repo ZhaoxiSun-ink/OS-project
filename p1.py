@@ -6,6 +6,7 @@ from process import Process#get process class
 from copy import deepcopy
 from rand48 import Rand48
 from queue import PriorityQueue
+from collections import deque
 
 #global variable
 letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
@@ -96,8 +97,35 @@ def FCFS(processes, cst):
 			return
 	
 
+
+# Shortest Job First (SJF) algorithm
+# It runs the process in order of shortest ESTIMATED CPU burst times
+
+#arg line - python3 p1.py 5 2 0.05 256 4 0.5 128 3
+#   tau i+1 =  alpha x t i   +  (1-alpha) x tau i
 def SJF(processes):
-	pass
+    print("SJF\n")
+    tau_0 = (1/parameter) # For every process, tau_0 = 1/lambda
+    ready_queue = list()
+    for process in processes:
+        tau_i = tau_0
+        estimated_brust_time = list()
+        for i in range(len(process.burst_times)):
+            tau_i = math.ceil( alpha * process.burst_times[i] + (1-alpha) * tau_i )
+            estimated_brust_time.append(tau_i)
+        process.setEstimatedBurstTime(estimated_brust_time)
+    #waiting_queue, sorted by arrival time
+    processes.sort(key=lambda p: p.arrival_time)
+    for process in processes:
+        print("Process Name: {} | arrival_time {}".format(process.name, process.getArrivalTime()) )
+        ready_queue.append(process)
+        while ready_queue:
+            ready_queue.sort(key=lambda p: p.estimated_brust_time[0])
+            process_to_running = ready_queue.pop(0)
+            print(process_to_running.name)
+
+    processes.sort(key=lambda p: p.estimated_brust_time[0])
+    #print("Process Name: {} | estimated_brust_time {}".format(process.name, process.estimated_brust_time[0]) )
 
 def SRT(processes):
 	pass
@@ -119,13 +147,13 @@ if __name__ == '__main__':
 	alpha = float(sys.argv[6])
 	t_slice = float(sys.argv[7])
 	rradd = float(sys.argv[8])
-	
+
 	processes = []
-	
+
 	#random generator
 	generator = Rand48(0)
 	generator.srand(seed)
-	
+
 	for x in range(n):
 		pid = letters[x]
 		temp = checkUpperBound(upper_bound)
@@ -145,3 +173,8 @@ if __name__ == '__main__':
 
 	processes1 = deepcopy(processes)
 	FCFS(processes1, t_cs/2)
+processes2 = deepcopy(processes)
+processes3 = deepcopy(processes)
+processes4 = deepcopy(processes)
+#FCFS(processes1)
+SJF(processes2)
