@@ -15,7 +15,7 @@ letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
 #check upper_bound
 def checkUpperBound(upper):
 	while(True):
-		temp = generator.drand()
+		temp = math.ceil(-(math.log(generator.drand())) / parameter)
 		if(temp > upper):
 			continue
 		else:
@@ -181,23 +181,34 @@ if __name__ == '__main__':
 
 	for x in range(n):
 		pid = letters[x]
-		temp = checkUpperBound(upper_bound)
-		arr = math.floor(-(math.log(temp)) / parameter)
-		num_burst = math.floor(checkUpperBound(upper_bound)*100)+1
+		while True:
+			tt = generator.drand()
+			temp = math.floor(-(math.log(tt)) / parameter)
+			if temp > upper_bound:
+				continue
+			else:
+				arr = temp
+				break
+		while True:
+			num_burst = math.floor(generator.drand()*100)+1
+			if num_burst > upper_bound:
+				continue
+			else:
+				break
 		burst = []
 		io = []
 		for y in range(num_burst-1):
 			a = checkUpperBound(upper_bound)
 			b = checkUpperBound(upper_bound)
-			burst.append(math.ceil(-(math.log(a)) / parameter))
-			io.append(math.ceil(-(math.log(b)) / parameter))
+			burst.append(a)
+			io.append(b)
 		c = checkUpperBound(upper_bound)
-		burst.append(math.ceil(-(math.log(c)) / parameter))
+		burst.append(c)
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
-
+	
 	processes1 = deepcopy(processes)
-	FCFS(processes1, t_cs/2)
+	#FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
