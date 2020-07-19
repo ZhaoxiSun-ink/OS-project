@@ -4,6 +4,7 @@ import sys #get argument
 import math # get log
 from process import Process#get process class
 from rand48 import Rand48
+from queue import PriorityQueue
 
 #global variable
 letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
@@ -18,6 +19,19 @@ def checkUpperBound(upper):
 		else:
 			return temp
 
+def FCFS(processes):
+	waiting_queue = []
+	event_queue = PriorityQueue()
+	event_queue.put((1, "st"))
+
+def SJF(processes):
+	pass
+
+def SRT(processes):
+	pass
+
+def RR(processes):
+	pass
 
 #main part
 if __name__ == '__main__':
@@ -56,6 +70,5 @@ if __name__ == '__main__':
 		burst.append(math.ceil(-(math.log(c)) / parameter))
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
-		
-	for process in processes:
-		process.print()
+
+	
