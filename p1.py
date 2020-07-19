@@ -22,7 +22,12 @@ def checkUpperBound(upper):
 def FCFS(processes):
 	waiting_queue = []
 	event_queue = PriorityQueue()
-	event_queue.put((1, "st"))
+	event_queue.put((4, "first"))
+	event_queue.put((3, "Third"))
+	event_queue.put((2, "Second"))
+	for i in range(3):
+		a = event_queue.get()
+		print(a)
 
 def SJF(processes):
 	pass
@@ -71,4 +76,5 @@ if __name__ == '__main__':
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 
-	
+	processes1 = deepcopy(processes)
+	FCFS(processes1)
