@@ -3,6 +3,7 @@
 import sys #get argument
 import math # get log
 from process import Process#get process class
+from copy import deepcopy
 from rand48 import Rand48
 from queue import PriorityQueue
 
@@ -18,30 +19,6 @@ def checkUpperBound(upper):
 			continue
 		else:
 			return temp
-
-#get list of processes
-def getProcesses():
-	processes = []
-	
-	for x in range(n):
-		pid = letters[x]
-		temp = checkUpperBound(upper_bound)
-		arr = math.floor(-(math.log(temp)) / parameter)
-		num_burst = math.floor(checkUpperBound(upper_bound)*100)+1
-		burst = []
-		io = []
-		for y in range(num_burst-1):
-			a = checkUpperBound(upper_bound)
-			b = checkUpperBound(upper_bound)
-			burst.append(math.ceil(-(math.log(a)) / parameter))
-			io.append(math.ceil(-(math.log(b)) / parameter))
-		c = checkUpperBound(upper_bound)
-		burst.append(math.ceil(-(math.log(c)) / parameter))
-		process = Process(pid,arr,burst,io)
-		processes.append(process)
-
-	return processes
-
 
 def FCFS(processes):
 	waiting_queue = []
@@ -72,12 +49,27 @@ if __name__ == '__main__':
 	t_slice = float(sys.argv[7])
 	rradd = float(sys.argv[8])
 	
+	processes = []
+	
 	#random generator
 	generator = Rand48(0)
 	generator.srand(seed)
+	
+	for x in range(n):
+		pid = letters[x]
+		temp = checkUpperBound(upper_bound)
+		arr = math.floor(-(math.log(temp)) / parameter)
+		num_burst = math.floor(checkUpperBound(upper_bound)*100)+1
+		burst = []
+		io = []
+		for y in range(num_burst-1):
+			a = checkUpperBound(upper_bound)
+			b = checkUpperBound(upper_bound)
+			burst.append(math.ceil(-(math.log(a)) / parameter))
+			io.append(math.ceil(-(math.log(b)) / parameter))
+		c = checkUpperBound(upper_bound)
+		burst.append(math.ceil(-(math.log(c)) / parameter))
+		process = Process(pid,arr,burst,io)
+		processes.append(process)
 
-"""
-	temp = getProcesses()
-	for i in temp:
-		i.print()
-"""	
+	
