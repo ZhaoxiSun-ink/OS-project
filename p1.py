@@ -40,22 +40,30 @@ def FCFS(processes):
 def SJF(processes):
     print("SJF\n")
     tau_0 = (1/parameter) # For every process, tau_0 = 1/lambda
-    arrive_queue = PriorityQueue()
+    ready_queue = list()
     for process in processes:
-        print(process.name)
         tau_i = tau_0
         estimated_brust_time = list()
         for i in range(len(process.burst_times)):
             tau_i = math.ceil( alpha * process.burst_times[i] + (1-alpha) * tau_i )
-            #print("actual CPU brust: {} | estimated CPU brust {}".format(process.burst_times[i], tau_i) )
             estimated_brust_time.append(tau_i)
         process.setEstimatedBurstTime(estimated_brust_time)
-        #process.printEstimatedBurstTime()
-        print(process.getArrivalTime())
+    #waiting_queue, sorted by arrival time
+    processes.sort(key=lambda p: p.arrival_time)
+    for process in processes:
+        print("Process Name: {} | arrival_time {}".format(process.name, process.getArrivalTime()) )
+        ready_queue.append(process)
+        while ready_queue:
+            ready_queue.sort(key=lambda p: p.estimated_brust_time[0])
+            process_to_running = ready_queue.pop(0)
+            print(process_to_running.name)
+
+    processes.sort(key=lambda p: p.estimated_brust_time[0])
+    #print("Process Name: {} | estimated_brust_time {}".format(process.name, process.estimated_brust_time[0]) )
 
 def SRT(processes):
 	pass
-		
+
 def RR(processes):
 	pass
 
