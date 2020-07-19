@@ -4,6 +4,7 @@ class Process():
         self.name = name
         self.arrival_time = arrival_time
         self.burst_times = burst_times
+        self.estimated_brust_time = []
         self.remaining_burst_times = list(burst_times)
         self.io_times = io_times
         self.total_bursts = len(burst_times)
@@ -18,7 +19,7 @@ class Process():
         # tmp Variables
         self.cpu_start_timestamp = -1
         self.cpu_end_timestamp = -1
-    
+
     # You can add getters to fill your needs
     def getArrivalTime(self):
         return self.arrival_time
@@ -28,14 +29,23 @@ class Process():
 
     def getStatus(self):
         return self.status
-    
+
+    # For SJF
+    def setEstimatedBurstTime(self, estimated_list):
+        self.estimated_brust_time = estimated_list
+
+    def printEstimatedBurstTime(self):
+        for i in self.estimated_brust_time:
+            print(i)
+
     def print(self):
         print("Process {} has {} CPU bursts, and arrvies at {}.".format(self.name, self.total_bursts, self.arrival_time))
         for i in range(self.total_bursts-1):
             print("Burst {} has a time {}, remains time {}, and IO time {}.".format(i, self.burst_times[i], self.remaining_burst_times[i], self.io_times[i]))
         print("Last Burst has a time {}, and remains time {}.".format(self.burst_times[self.total_bursts-1], self.remaining_burst_times[self.total_bursts-1]))
         print("Process is at burst {} and has status {}.".format(self.index, self.status))
-    
+
+
     # Process arrives, and gets added to the ready queue
     # Modifies: Adds a new tuple to waiting_times; Changes status to "Ready"
     # Returns: Nothing
@@ -43,7 +53,7 @@ class Process():
         assert self.status == None
         self.waiting_times.append((self.arrival_time, -1))
         self.status = "Ready"
-    
+
     # Start Context Switch into CPU
     # Requires: Process must be at "Ready" status
     # Modifies: Adds a new tuple to turnaround_times (start turnaround timer); Changes status to "Context_Switch_In"
@@ -121,5 +131,3 @@ if __name__ == "__main__":
     process0.startContextSwitchOut(16 + future)
     process0.finishRunning(18 + future)
     process0.print()
-
-

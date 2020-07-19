@@ -30,8 +30,24 @@ def FCFS(processes):
 		a = event_queue.get()
 		print(a)
 
+
+# Shortest Job First (SJF) algorithm
+# It runs the process in order of shortest ESTIMATED CPU burst times
+
+#arg line - python3 p1.py 1 2 0.05 256 4 0.5 128 3
+#   tau i+1 =  alpha x t i   +  (1-alpha) x tau i
 def SJF(processes):
-	pass
+    tau_0 = (1/parameter) # For every process, tau_0 = 1/lambda
+    for process in processes:
+        print(process.name)
+        tau_i = tau_0
+        estimated_brust_time = list()
+        for i in range(len(process.burst_times)):
+            tau_i = math.ceil( alpha * process.burst_times[i] + (1-alpha) * tau_i )
+            print("actual CPU brust: {} | estimated CPU brust {}".format(process.burst_times[i], tau_i) )
+            estimated_brust_time.append(tau_i)
+        process.setEstimatedBurstTime(estimated_brust_time)
+        process.printEstimatedBurstTime()
 
 def SRT(processes):
 	pass
@@ -53,13 +69,13 @@ if __name__ == '__main__':
 	alpha = float(sys.argv[6])
 	t_slice = float(sys.argv[7])
 	rradd = float(sys.argv[8])
-	
+
 	processes = []
-	
+
 	#random generator
 	generator = Rand48(0)
 	generator.srand(seed)
-	
+
 	for x in range(n):
 		pid = letters[x]
 		temp = checkUpperBound(upper_bound)
@@ -77,5 +93,9 @@ if __name__ == '__main__':
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 
-	processes1 = deepcopy(processes)
-	FCFS(processes1)
+processes1 = deepcopy(processes)
+processes2 = deepcopy(processes)
+processes3 = deepcopy(processes)
+processes4 = deepcopy(processes)
+FCFS(processes1)
+SJF(processes2)
