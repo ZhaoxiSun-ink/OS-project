@@ -34,20 +34,23 @@ def FCFS(processes):
 # Shortest Job First (SJF) algorithm
 # It runs the process in order of shortest ESTIMATED CPU burst times
 
-#arg line - python3 p1.py 1 2 0.05 256 4 0.5 128 3
+#arg line - python3 p1.py 5 2 0.05 256 4 0.5 128 3
 #   tau i+1 =  alpha x t i   +  (1-alpha) x tau i
 def SJF(processes):
+    print("SJF\n")
     tau_0 = (1/parameter) # For every process, tau_0 = 1/lambda
+    arrive_queue = PriorityQueue()
     for process in processes:
         print(process.name)
         tau_i = tau_0
         estimated_brust_time = list()
         for i in range(len(process.burst_times)):
             tau_i = math.ceil( alpha * process.burst_times[i] + (1-alpha) * tau_i )
-            print("actual CPU brust: {} | estimated CPU brust {}".format(process.burst_times[i], tau_i) )
+            #print("actual CPU brust: {} | estimated CPU brust {}".format(process.burst_times[i], tau_i) )
             estimated_brust_time.append(tau_i)
         process.setEstimatedBurstTime(estimated_brust_time)
-        process.printEstimatedBurstTime()
+        #process.printEstimatedBurstTime()
+        print(process.getArrivalTime())
 
 def SRT(processes):
 	pass
@@ -97,5 +100,5 @@ processes1 = deepcopy(processes)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
-FCFS(processes1)
+#FCFS(processes1)
 SJF(processes2)
