@@ -32,6 +32,28 @@ class Process():
 
     def getStatus(self):
         return self.status
+    
+    def getTotalBurstTime(self):
+        ans = 0
+        for burst in self.burst_times:
+            ans += burst
+        return int(ans)
+    
+    def getTotalWaitingTime(self):
+        ans = 0
+        for interval in self.waiting_times:
+            if interval[1] == -1:
+                break
+            ans += interval[1] - interval[0]
+        return ans
+    
+    def getTotalTurnaroundTime(self):
+        ans = 0
+        for interval in self.turnaround_times:
+            if interval[1] == -1:
+                break
+            ans += interval[1] - interval[0]
+        return ans
 
     # For SJF
     def setEstimatedBurstTime(self, estimated_list):
@@ -108,6 +130,7 @@ class Process():
         turnaround_time_start_timestamp = self.turnaround_times[len(self.turnaround_times) - 1][0]
         self.turnaround_times[len(self.turnaround_times) - 1] = (turnaround_time_start_timestamp, time)
         if self.index == self.total_bursts - 1:
+            self.status = "Terminated"
             return -1
         return self.io_times[self.index]
 
