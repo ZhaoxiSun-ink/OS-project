@@ -20,15 +20,81 @@ def checkUpperBound(upper):
 		else:
 			return temp
 
-def FCFS(processes):
+def FCFS(processes, cst):
+	"""def printwq(waitq):
+		string = " "
+		for element in waitq:
+			string = string + element + " """
+		
+	# preprocessing
+	process_table = {}
 	waiting_queue = []
 	event_queue = PriorityQueue()
-	event_queue.put((4, "first"))
-	event_queue.put((3, "Third"))
-	event_queue.put((2, "Second"))
-	for i in range(3):
-		a = event_queue.get()
-		print(a)
+	time = 0
+	current_running = None
+	CPU_vacant_at = -1
+	# push all processes to event_queue
+	for process in processes:
+		arrival_time = process.getArrivalTime()
+		name = process.getName()
+		event_queue.put((arrival_time, (name, "Arrive")))
+		process_table[name] = process
+		print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
+	print("time 0ms: Simulator started for FCFS [Q <empty>]")
+	while(len(process_table) > 0):
+		next_event = event_queue.get()
+		time = next_event[0]
+		process_name = next_event[1][0]
+		event_type = next_event[1][1]
+		process = process_table[process_name]
+		if event_type == "Arrive":
+			process.arrive()
+			waiting_queue.append(process_name)
+			print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, waiting_queue))
+			if len(waiting_queue) == 0 and (current_running == None or time >= CPU_vacant_at):
+				waiting_queue.pop(0)
+				event_queue.put((time + cst, (process_name, "Run")))
+				process.startContextSwitchIn(time)
+				current_running = process_name
+		elif event_type == "Run":
+			expected = process.startRunning(time)
+			event_queue.put((time + expected, (process_name, "CSOut")))
+			CPU_vacant_at = time + expected + cst
+			print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, waiting_queue))
+		elif event_type == "CSOut":
+			process.startContextSwitchOut(time)
+			event_queue.put((time + cst, (process_name, "EnterIO")))
+			print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.total_bursts-process.index-1, waiting_queue))
+			if process.index < process.total_bursts - 1:
+				print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, time + cst + process.io_times[process.index], waiting_queue))
+		elif event_type == "EnterIO":
+			expected = process.finishRunning(time)
+			if expected == -1:
+				print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, waiting_queue))
+				del process_table[process_name]
+				continue
+			event_queue.put((time + expected, (process_name, "EnterQueue")))
+			current_running = None
+			# Start running another immediately, if there is another one on the waiting queue
+			if len(waiting_queue) > 0:
+				new_name = waiting_queue.pop(0)
+				new_process = process_table[new_name]
+				event_queue.put((time + cst, (new_name, "Run")))
+				new_process.startContextSwitchIn(time)
+				current_running = new_name
+		elif event_type == "EnterQueue":
+			process.finishIO(time)
+			waiting_queue.append(process_name)
+			print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, waiting_queue))
+			if len(waiting_queue) == 0 and (current_running == None or time >= CPU_vacant_at):
+				waiting_queue.pop(0)
+				event_queue.put((time + cst, (process_name, "Run")))
+				process.startContextSwitchIn(time)
+				current_running = process_name
+		else:
+			print("Something went wrong")
+			return
+	
 
 def SJF(processes):
 	pass
@@ -78,4 +144,4 @@ if __name__ == '__main__':
 		processes.append(process)
 
 	processes1 = deepcopy(processes)
-	FCFS(processes1)
+	FCFS(processes1, t_cs/2)

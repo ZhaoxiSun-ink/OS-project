@@ -20,6 +20,9 @@ class Process():
         self.cpu_end_timestamp = -1
     
     # You can add getters to fill your needs
+    def getName(self):
+        return self.name
+
     def getArrivalTime(self):
         return self.arrival_time
 
@@ -105,7 +108,7 @@ class Process():
     # Returns: Nothing
     def finishIO(self, time):
         assert self.status == "IO"
-        self.status = "waiting"
+        self.status = "Ready"
         self.waiting_times.append((time, -1))
         self.index += 1
 
