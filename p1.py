@@ -210,6 +210,7 @@ def SJF(processes, cst):
         else:
             print("ERROR: <error-text-here>")
             return
+            
 def SRT(processes):
 	pass
 

@@ -95,10 +95,11 @@ def SRT(processes,cst):
 				new_process = process_table[new_name]
 				event_queue.put((time+cst, (new_name, "Run")))
 				new_process.startContextSwitchIn(time)
-				current_running = new_name
+				current_running = new_process
 		
 		elif event_type == "EnterQueue":
-			process.finishIO(time)
+			if process.getStatus == "IO":
+				process.finishIO(time)
 			ready_queue.append(process_table[process_name])
 			ready_queue.sort(key=sort_function())
 			print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
@@ -106,7 +107,19 @@ def SRT(processes,cst):
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
-                current_running = process_name
+                current_running = process
+			if len(ready_queue) == 1 and current_running != None and current_running.getEstimatedRemaining() > process.getEstimatedRemaining():
+				ready_queue.pop(0)
+				event_queue.put((time + cst, (process_name, "Run")))
+                process.startContextSwitchIn(time)
+				preemption_process = current_running
+				current_running = process
+				event_queue.put((time+cst,(preemption_process.getName(),"EnterQueue")))
+				preemption_process.startContextSwitchOut()
+				preemption_process.preempt()
+
+
+
 
 		else:
 			print("ERROR: <error-text-here>")
