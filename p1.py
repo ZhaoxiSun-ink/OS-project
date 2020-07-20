@@ -510,10 +510,5 @@ FCFS(processes1, t_cs/2)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 print()
-<<<<<<< HEAD
-#SJF(processes2, t_cs/2)
-SRT(processes3,t_cs/2)"""
-=======
 SJF(processes2, t_cs/2)
 #SRT(processes3,t_cs/2)
->>>>>>> ed829b0bd8e622d2a8f4683b678195d2f4082e90
