@@ -106,6 +106,7 @@ def SRT(processes,cst):
                 process.startContextSwitchIn(time)
                 current_running = process
 			if len(ready_queue) == 1 and current_running != None and current_running.getEstimatedRemaining() > process.getEstimatedRemaining():
+				print("preemption")
 				ready_queue.pop(0)
 				event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
