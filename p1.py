@@ -120,7 +120,7 @@ def SJF(processes, cst):
         process.setEstimatedBurstTime(estimated_brust_time)
     #waiting_queue, sorted by arrival time
     process_table = dict()
-    waiting_queue = list()
+    ready_queue = list()
     event_queue = PriorityQueue()
     time = 0
     current_running = None
@@ -142,18 +142,56 @@ def SJF(processes, cst):
         process = process_table[process_name]
         if event_type == "Arrive":
             process.arrive()
-            waiting_queue.append(process_name)
-            print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, waiting_queue))
-            if len(waiting_queue) != 0 and (current_running == None or time >= CPU_vacant_at):
-                waiting_queue.pop(0)
+            ready_queue.append(process_name)
+            print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, ready_queue))
+            if len(ready_queue) != 0 and (current_running == None or time >= CPU_vacant_at):
+                #sort the ready_queue
+                ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
                 current_running = process_name
                 print("Current Running Process - {}".format(current_running) )
         elif event_type == "Run":
-            expected = 
-
-
+            expected = process.startRunning(time)
+            event_queue.put((time + expected, (process_name, "CSOut")))
+            CPU_vacant_at = time + expected + cst
+            print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, ready_queue))
+        elif event_type == "CSOut":
+            process.startContextSwitchOut(time)
+            event_queue.put((time + cst, (process_name, "EnterIO")))
+            print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.total_bursts-process.index-1, ready_queue))
+            # recaculate_tau
+            if process.index < process.total_bursts - 1:
+                print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), ready_queue))
+            context_switch_count += 1
+        elif event_type == "EnterIO":
+            expected = process.finishRunning(time)
+            print("expected: {}".format(expected) )
+            if expected == -1:
+                print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, ready_queue))
+                del process_table[process_name]
+                continue
+            event_queue.put((time + expected, (process_name, "EnterQueue")))
+            current_running = None
+            # Start running another immediately, if there is another one on the waiting queue
+            if len(ready_queue) > 0:
+                new_name = ready_queue.pop(0)
+                new_process = process_table[new_name]
+                event_queue.put((time + cst, (new_name, "Run")))
+                new_process.startContextSwitchIn(time)
+                current_running = new_name
+        elif event_type == "EnterQueue":
+            process.finishIO(time)
+            ready_queue.append(process_name)
+            print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, ready_queue))
+            if len(ready_queue) == 1 and (current_running == None or time >= CPU_vacant_at):
+                ready_queue.pop(0)
+                event_queue.put((time + cst, (process_name, "Run")))
+                process.startContextSwitchIn(time)
+                current_running = process_name
+        else:
+            print("ERROR <???>")
+            return
 def SRT(processes):
 	pass
 
@@ -208,9 +246,8 @@ if __name__ == '__main__':
 		burst.append(c)
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
-	
-	processes1 = deepcopy(processes)
-	FCFS(processes1, t_cs/2)
+processes1 = deepcopy(processes)
+#FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)

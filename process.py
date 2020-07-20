@@ -32,13 +32,13 @@ class Process():
 
     def getStatus(self):
         return self.status
-    
+
     def getTotalBurstTime(self):
         ans = 0
         for burst in self.burst_times:
             ans += burst
         return int(ans)
-    
+
     def getTotalWaitingTime(self):
         ans = 0
         for interval in self.waiting_times:
@@ -46,7 +46,7 @@ class Process():
                 break
             ans += interval[1] - interval[0]
         return ans
-    
+
     def getTotalTurnaroundTime(self):
         ans = 0
         for interval in self.turnaround_times:
