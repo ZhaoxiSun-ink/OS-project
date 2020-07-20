@@ -210,7 +210,7 @@ def RR(processes):
 
 #main part
 if __name__ == '__main__':
-	if len(sys.argv) != 9:
+	if len(sys.argv) < 8:
 		print("ERROR: Invalid argument.")
 		sys.exit(2)
 
@@ -221,7 +221,9 @@ if __name__ == '__main__':
 	t_cs = float(sys.argv[5])
 	alpha = float(sys.argv[6])
 	t_slice = float(sys.argv[7])
-	rradd = float(sys.argv[8])
+	rradd = "END"
+	if sys.argv >= 9:
+		rradd = sys.argv[8]
 
 	processes = []
 
