@@ -4,7 +4,7 @@ class Process():
         self.name = name
         self.arrival_time = arrival_time
         self.burst_times = burst_times
-        self.estimated_brust_time = 0
+        self.estimated_burst_time = 0
         self.remaining_burst_times = list(burst_times)
         self.io_times = io_times
         self.total_bursts = len(burst_times)
@@ -19,7 +19,7 @@ class Process():
         # tmp Variables
         self.cpu_start_timestamp = -1
         self.cpu_end_timestamp = -1
-        self.estimated_remaining_burst_time = self.estimated_brust_time - (self.burst_times[self.index] - self.remaining_burst_times[self.index])
+        self.estimated_remaining_burst_time = self.estimated_burst_time - (self.burst_times[self.index] - self.remaining_burst_times[self.index])
 
     # You can add getters to fill your needs
     def getName(self):
