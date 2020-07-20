@@ -245,6 +245,7 @@ def SRT(processes,cst):
 
     #waiting_queue, sorted by arrival time
     process_table = dict()
+    ignore_list= []
     ready_queue = []
     event_queue = PriorityQueue()
     time = 0
@@ -283,9 +284,13 @@ def SRT(processes,cst):
             expected = process.startRunning(time)
             event_queue.put((time + expected, (process_name, "CSOut")))
             CPU_vacant_at = time + expected + cst
+            print(time+expected)
             print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
 
         elif event_type == "CSOut":
+            if next_event in ignore_list:
+                ignore_list.pop(0)
+                continue
             process.startContextSwitchOut(time)
             if process.total_bursts-process.index-1 == 0:
                 event_queue.put((time,(process_name, "EnterIO")))
@@ -316,7 +321,7 @@ def SRT(processes,cst):
                 event_queue.put((time+expected, (process_name, "EnterQueue")))
             current_running = None
             if len(ready_queue) > 0:
-                new_name = ready_queue.pop(0)
+                new_name = ready_queue.pop(0).getName()
                 new_process = process_table[new_name]
                 event_queue.put((time+cst, (new_name, "Run")))
                 new_process.startContextSwitchIn(time)
@@ -329,21 +334,31 @@ def SRT(processes,cst):
             ready_queue.append(process_table[process_name])
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
             print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
+            if current_running != None:
+                print(current_running.getStatus())
+                print(current_running.getEstimatedRemaining(time))
+                print(current_running.getEstimatedRemaining(time) > process.getEstimatedRemaining(time))
+            print(process.getEstimatedRemaining(time))
             if len(ready_queue) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
                 current_running = process
-            if len(ready_queue) == 1 and current_running != None and current_running.getEstimatedRemaining() > process.getEstimatedRemaining():
+            if current_running != None and (current_running.getStatus() == "Running" or current_running.getStatus() == "Context_Switch_In") and current_running.getEstimatedRemaining(time) > process.getEstimatedRemaining(time):
                 print("preemption")
                 ready_queue.pop(0)
-                event_queue.put((time + cst, (process_name, "Run")))
-                process.startContextSwitchIn(time)
+                event_queue.put((time + 2*cst, (process_name, "Run")))
+                process.startContextSwitchIn(time+cst)
                 preemption_process = current_running
                 current_running = process
                 event_queue.put((time+cst,(preemption_process.getName(),"EnterQueue")))
-                preemption_process.startContextSwitchOut()
-                preemption_process.preempt()
+                if current_running.getStatus() == "Running":
+                    preemption_process.startContextSwitchOut(time)
+                    preemption_process.preempt(time+cst)
+                elif current_running.getStatus() == "Context_Switch_In":
+                    
+                should_finish_time = time + preemption_process.getEstimatedRemaining(time)
+                ignore_list.append((should_finish_time,(preemption_process.getName(),"CSOut")))
 
         else:
             print("ERROR: <error-text-here>")
@@ -508,10 +523,10 @@ if __name__ == '__main__':
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 processes1 = deepcopy(processes)
-FCFS(processes1, t_cs/2)
-"""processes2 = deepcopy(processes)
+#FCFS(processes1, t_cs/2)
+processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 print()
-SJF(processes2, t_cs/2)
-#SRT(processes3,t_cs/2)"""
+#SJF(processes2, t_cs/2)
+SRT(processes3,t_cs/2)
