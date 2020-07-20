@@ -222,18 +222,18 @@ def SRT(processes,cst):
     def print_ready_queue(waitq):
         if len(waitq) == 0:
             return "<empty>"
-        ans = waitq[0]
+        ans = waitq[0].getName()
         for i in range(1,len(waitq)):
             ans = ans + " " + waitq[i].getName()
         return ans
 
     def recalculate_tau(process,index):
         tau_i = math.ceil(alpha * process.burst_times[index] + (1-alpha) * process.estimated_burst_time)
-        process.estimated_brust_time = tau_i
+        process.estimated_burst_time = tau_i
 
     #initalize all process
     for p in processes:
-        p.estimated_brust_time = 1/parameter
+        p.estimated_burst_time = 1/parameter
 
     #waiting_queue, sorted by arrival time
     process_table = dict()
@@ -280,10 +280,10 @@ def SRT(processes,cst):
         elif event_type == "CSOut":
             process.startContextSwitchOut(time)
             if process.total_bursts-process.index-1 == 0:
-                event_queue.put((time,(process_name, "EnterQueue")))
+                event_queue.put((time,(process_name, "EnterIO")))
             else:
-                event_queue.put((time + expected, (process_name, "EnterIO")))
-                CPU_vacant_at = time + expected + cst
+                event_queue.put((time + cst, (process_name, "EnterIO")))
+                CPU_vacant_at = time + cst
                 if process.total_bursts-process.index-1 == 1:
                     print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
                 else:
@@ -291,7 +291,7 @@ def SRT(processes,cst):
                 if process.index < process.total_bursts -1:
                     recalculate_tau(process,process.index) #recaculate_tau
                     print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue) ))
-                    # Sort the ready queue by estimated_brust_time
+                    # Sort the ready queue by estimated_burst_time
                     ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
                     # switch out
                     print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready_queue(ready_queue) ))
@@ -299,6 +299,8 @@ def SRT(processes,cst):
 
         elif event_type == "EnterIO":
             expected = process.finishRunning(time)
+            print(time)
+            print(expected)
             if expected == -1:
                 print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
                 del process_table[process_name]
@@ -314,6 +316,7 @@ def SRT(processes,cst):
 
         elif event_type == "EnterQueue":
             if process.getStatus() == "IO":
+                print(time)
                 process.finishIO(time)
             ready_queue.append(process_table[process_name])
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
