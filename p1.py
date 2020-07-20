@@ -55,7 +55,8 @@ def FCFS(processes, cst):
 		if event_type == "Arrive":
 			process.arrive()
 			waiting_queue.append(process_name)
-			print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
+			if time <= 1000:
+				print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
 			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
 				event_queue.put((time + cst, 2, process_name, "Run"))
@@ -65,18 +66,19 @@ def FCFS(processes, cst):
 			expected = process.startRunning(time)
 			event_queue.put((time + expected, 0, process_name, "CSOut"))
 			CPU_vacant_at = time + expected + cst
-			print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))
+			if time <= 1000:
+				print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))
 		elif event_type == "CSOut":
 			process.startContextSwitchOut(time)
 			event_queue.put((time + cst, 1, process_name, "EnterIO"))
 			remaining_bursts = process.total_bursts-process.index-1
-			if remaining_bursts > 1:
+			if remaining_bursts > 1 and time <= 1000:
 				print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, remaining_bursts, printwq(waiting_queue)))
-			elif remaining_bursts == 1:
+			elif remaining_bursts == 1 and time <= 1000:
 				print("time {}ms: Process {} completed a CPU burst; 1 burst to go [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			else:
+			elif remaining_bursts == 0:
 				print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if process.index < process.total_bursts - 1:
+			if process.index < process.total_bursts - 1 and time <= 1000:
 				print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
 			context_switch_count += 1
 		elif event_type == "EnterIO":
@@ -96,7 +98,8 @@ def FCFS(processes, cst):
 		elif event_type == "EnterQueue":
 			process.finishIO(time)
 			waiting_queue.append(process_name)
-			print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
+			if time <= 1000:
+				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
 			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
 				event_queue.put((time + cst, 2, process_name, "Run"))
@@ -511,4 +514,4 @@ processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 print()
 SJF(processes2, t_cs/2)
-#SRT(processes3,t_cs/2)
+#SRT(processes3,t_cs/2)"""
