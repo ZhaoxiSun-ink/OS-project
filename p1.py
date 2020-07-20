@@ -55,7 +55,7 @@ def FCFS(processes, cst):
 			process.arrive()
 			waiting_queue.append(process_name)
 			print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and (current_running == None or time >= CPU_vacant_at):
+			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
 				event_queue.put((time + cst, (process_name, "Run")))
 				process.startContextSwitchIn(time)
@@ -91,7 +91,7 @@ def FCFS(processes, cst):
 			process.finishIO(time)
 			waiting_queue.append(process_name)
 			print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and (current_running == None or time >= CPU_vacant_at):
+			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
 				event_queue.put((time + cst, (process_name, "Run")))
 				process.startContextSwitchIn(time)
@@ -151,7 +151,7 @@ def SJF(processes, cst):
             process.arrive()
             ready_queue.append(process_name)
             print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
-            if len(ready_queue) != 0 and (current_running == None or time >= CPU_vacant_at):
+            if len(ready_queue) != 0 and current_running == None and time >= CPU_vacant_at:
                 #sort the ready_queue
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
@@ -194,7 +194,7 @@ def SJF(processes, cst):
             process.finishIO(time)
             ready_queue.append(process_name)
             print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
-            if len(ready_queue) == 1 and (current_running == None or time >= CPU_vacant_at):
+            if len(ready_queue) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
@@ -240,7 +240,7 @@ def RR(processes):
 			waiting_queue.append(process_name)
 			if time <= 1000:
 				print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and (current_running == None or time >= CPU_vacant_at):
+			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
 				event_queue.put((time + cst, (process_name, "Run", 0)))
 				process.startContextSwitchIn(time)
@@ -303,7 +303,7 @@ def RR(processes):
 			waiting_queue.append(process_name)
 			if time <= 1000:
 				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and (current_running == None or time >= CPU_vacant_at):
+			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
 				event_queue.put((time + cst, (process_name, "Run", 0)))
 				process.startContextSwitchIn(time)
