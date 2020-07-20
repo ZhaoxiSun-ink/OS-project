@@ -19,6 +19,7 @@ class Process():
         # tmp Variables
         self.cpu_start_timestamp = -1
         self.cpu_end_timestamp = -1
+        self.current_remaining_burst_time = self.remaining_burst_times[self.index] #get current remaining burst time easyily for SRT
 
     # You can add getters to fill your needs
     def getName(self):
@@ -32,6 +33,9 @@ class Process():
 
     def getStatus(self):
         return self.status
+
+    def getCurrentRemaining(self):
+        return self.current_remaining_burst_time
 
     def getTotalBurstTime(self):
         ans = 0
