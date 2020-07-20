@@ -19,7 +19,7 @@ class Process():
         # tmp Variables
         self.cpu_start_timestamp = -1
         self.cpu_end_timestamp = -1
-        self.current_remaining_burst_time = self.remaining_burst_times[self.index] #get current remaining burst time easyily for SRT
+        self.estimated_remaining_burst_time = self.estimated_brust_time - (self.burst_times[self.index] - self.remaining_burst_times[self.index])
 
     # You can add getters to fill your needs
     def getName(self):
