@@ -281,6 +281,8 @@ def SRT(processes,cst):
                 current_running = process
         #run
         elif event_type == "Run":
+            print(time)
+            print(process.getStatus())
             expected = process.startRunning(time)
             event_queue.put((time + expected, (process_name, "CSOut")))
             CPU_vacant_at = time + expected + cst
@@ -352,11 +354,14 @@ def SRT(processes,cst):
                 preemption_process = current_running
                 current_running = process
                 event_queue.put((time+cst,(preemption_process.getName(),"EnterQueue")))
-                if current_running.getStatus() == "Running":
+                if preemption_process.getStatus() == "Running":
                     preemption_process.startContextSwitchOut(time)
                     preemption_process.preempt(time+cst)
-                elif current_running.getStatus() == "Context_Switch_In":
-                    
+                elif preemption_process.getStatus() == "Context_Switch_In":
+                    # Current process enter queue
+                    # Push a preempt event to event queue
+                    # In a preempt event, current process pushes a "Run" to event queue at time + cst
+                    event_queue.put(time+1, )
                 should_finish_time = time + preemption_process.getEstimatedRemaining(time)
                 ignore_list.append((should_finish_time,(preemption_process.getName(),"CSOut")))
 

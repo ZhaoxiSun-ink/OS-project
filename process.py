@@ -117,7 +117,7 @@ class Process():
         self.status = "Ready"
         self.waiting_times.append((time, -1))
 
-    def preemptDuringCSIn(self, time):
+    def preemptDuringCSIn(self,time):
         assert self.status == "Context_Switch_In"
         self.status = "Ready"
         self.turnaround_times.pop()
