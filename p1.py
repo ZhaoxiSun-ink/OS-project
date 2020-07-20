@@ -192,7 +192,7 @@ def SJF(processes, cst):
                 new_name = ready_state.pop(0).name
                 new_process = process_table[new_name]
                 event_queue.put((time + cst, (new_name, "Run")))
-                new_process.startContextSwitchIn(time)
+                new_process.startContextSwitchIn(time) #problem here
                 current_running = new_name
         elif event_type == "EnterQueue":
             process.finishIO(time)
