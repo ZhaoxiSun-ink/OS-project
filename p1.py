@@ -271,7 +271,7 @@ def SRT(processes,cst):
         elif event_type == "CSOut":
             process.startContextSwitchOut(time)
             if process.total_bursts-process.index-1 == 0:
-                event_queue.put((time,(process_name, "EnterQueue")))
+                event_queue.put((time,(process_name, "EnterIO")))
             else:
                 event_queue.put((time + cst, (process_name, "EnterIO")))
                 CPU_vacant_at = time + cst
