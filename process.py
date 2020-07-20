@@ -61,7 +61,7 @@ class Process():
 
     # For SJF and SRT
     def getEstimatedBurstTime(self):
-        return int(self.estimated_brust_time)
+        return int(self.estimated_burst_time)
 
 
     def print(self):
