@@ -77,8 +77,8 @@ def FCFS(processes, cst):
 			if expected == -1:
 				print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
 				del process_table[process_name]
-				continue
-			event_queue.put((time + expected, (process_name, "EnterQueue")))
+			else:
+				event_queue.put((time + expected, (process_name, "EnterQueue")))
 			current_running = None
 			# Start running another immediately, if there is another one on the waiting queue
 			if len(waiting_queue) > 0:
@@ -207,8 +207,8 @@ if __name__ == '__main__':
 		processes.append(process)
 	
 	processes1 = deepcopy(processes)
-	#FCFS(processes1, t_cs/2)
+	FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
-SJF(processes2)
+#SJF(processes2)
