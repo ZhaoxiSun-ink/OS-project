@@ -213,7 +213,7 @@ def SRT(processes,cst):
     def print_ready_queue(waitq):
         if len(waitq) == 0:
             return "<empty>"
-        ans = waitq[0]
+        ans = waitq[0].getName()
         for i in range(1,len(waitq)):
             ans = ans + " " + waitq[i].getName()
         return ans
