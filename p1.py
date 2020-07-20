@@ -97,7 +97,7 @@ def FCFS(processes, cst):
 				process.startContextSwitchIn(time)
 				current_running = process_name
 		else:
-			print("Something went wrong")
+			print("ERROR: <error-text-here>")
 			return
 
 
@@ -106,18 +106,25 @@ def FCFS(processes, cst):
 # It runs the process in order of shortest ESTIMATED CPU burst times
 
 #arg line - python3 p1.py 5 2 0.05 256 4 0.5 128 3
-#   tau i+1 =  alpha x t i   +  (1-alpha) x tau i
 def SJF(processes, cst):
-    # preprocessing, caculating tau (estimated_brust_time)
-    tau_0 = (1/parameter) # For every process, tau_0 = 1/lambda
-    ready_queue = list()
+    # convert the ready_queue list to string
+    def print_ready_queue(waitq):
+        if len(waitq) == 0:
+            return "<empty>"
+        ans = waitq[0]
+        for i in range(1, len(waitq)):
+            ans = ans + " " + waitq[i]
+        return ans
+    # caculating tau (estimated_brust_time)
+    def recaculate_tau(process, index):
+        # tau_i+1 =  alpha x t_i   +  (1-alpha) x tau i
+        tau_i = math.ceil( alpha * process.burst_times[index] + (1-alpha) * process.estimated_brust_time )
+        process.estimated_brust_time = tau_i
+
     for process in processes:
-        tau_i = tau_0
-        estimated_brust_time = list()
-        for i in range(len(process.burst_times)):
-            tau_i = math.ceil( alpha * process.burst_times[i] + (1-alpha) * tau_i )
-            estimated_brust_time.append(tau_i)
-        process.setEstimatedBurstTime(estimated_brust_time)
+        tau_0 = (1/parameter) # For every process, tau_0 = 1/lambda
+        process.estimated_brust_time = tau_0
+
     #waiting_queue, sorted by arrival time
     process_table = dict()
     ready_queue = list()
@@ -132,7 +139,7 @@ def SJF(processes, cst):
         name = process.getName()
         event_queue.put((arrival_time, (name, "Arrive")))
         process_table[name] = process
-        print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), tau_0 ))
+        print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), process.getEstimatedBurstTime() ))
     print("time 0ms: Simulator started for SJF [Q <empty>]")
     while( len(process_table) > 0 ):
         next_event = event_queue.get()
@@ -143,35 +150,38 @@ def SJF(processes, cst):
         if event_type == "Arrive":
             process.arrive()
             ready_queue.append(process_name)
-            print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, ready_queue))
+            print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
             if len(ready_queue) != 0 and (current_running == None or time >= CPU_vacant_at):
                 #sort the ready_queue
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
                 current_running = process_name
-                print("Current Running Process - {}".format(current_running) )
         elif event_type == "Run":
             expected = process.startRunning(time)
             event_queue.put((time + expected, (process_name, "CSOut")))
             CPU_vacant_at = time + expected + cst
-            print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, ready_queue))
+            print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
         elif event_type == "CSOut":
             process.startContextSwitchOut(time)
             event_queue.put((time + cst, (process_name, "EnterIO")))
-            print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.total_bursts-process.index-1, ready_queue))
-            # recaculate_tau
+            print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
             if process.index < process.total_bursts - 1:
-                print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), ready_queue))
+                # recaculate_tau:
+                recaculate_tau(process, process.index)
+                print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue) ))
+                # Sort the ready queue by estimated_brust_time
+                sorted(ready_queue, key=lambda ready_queue: process.estimated_brust_time)
+                # switch out
+                print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready_queue(ready_queue) ))
             context_switch_count += 1
         elif event_type == "EnterIO":
             expected = process.finishRunning(time)
-            print("expected: {}".format(expected) )
             if expected == -1:
-                print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, ready_queue))
+                print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
                 del process_table[process_name]
-                continue
-            event_queue.put((time + expected, (process_name, "EnterQueue")))
+            else:
+                event_queue.put((time + expected, (process_name, "EnterQueue")))
             current_running = None
             # Start running another immediately, if there is another one on the waiting queue
             if len(ready_queue) > 0:
@@ -183,14 +193,14 @@ def SJF(processes, cst):
         elif event_type == "EnterQueue":
             process.finishIO(time)
             ready_queue.append(process_name)
-            print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, ready_queue))
+            print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
             if len(ready_queue) == 1 and (current_running == None or time >= CPU_vacant_at):
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
                 current_running = process_name
         else:
-            print("ERROR <???>")
+			print("ERROR: <error-text-here>")
             return
 def SRT(processes):
 	pass

@@ -4,7 +4,7 @@ class Process():
         self.name = name
         self.arrival_time = arrival_time
         self.burst_times = burst_times
-        self.estimated_brust_time = []
+        self.estimated_brust_time = 0
         self.remaining_burst_times = list(burst_times)
         self.io_times = io_times
         self.total_bursts = len(burst_times)
@@ -55,13 +55,10 @@ class Process():
             ans += interval[1] - interval[0]
         return ans
 
-    # For SJF
-    def setEstimatedBurstTime(self, estimated_list):
-        self.estimated_brust_time = estimated_list
+    # For SJF and SRT
+    def getEstimatedBurstTime(self):
+        return int(self.estimated_brust_time)
 
-    def printEstimatedBurstTime(self):
-        for i in self.estimated_brust_time:
-            print(i)
 
     def print(self):
         print("Process {} has {} CPU bursts, and arrvies at {}.".format(self.name, self.total_bursts, self.arrival_time))
