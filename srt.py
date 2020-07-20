@@ -1,7 +1,4 @@
 def SRT(processes,cst):
-	#sort function
-	def sort_function(p):
-		return p.estimated_remaining_burst_time
 
 	def print_ready_queue(waitq):
 		if(waitq) == 0:
@@ -46,7 +43,7 @@ def SRT(processes,cst):
 		if event_type == "Arrive":
 			process.arrive()
 			ready_queue.append(process_table[process_name])
-			ready_queue.sort(key=sort_function())
+			ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
 			print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
 			if len(ready_queue) != 0 and (current_running == None and time >= CPU_vacant_at):
 				ready_queue.pop(0)
@@ -76,7 +73,7 @@ def SRT(processes,cst):
 				recalculate_tau(process,process.index) #recaculate_tau
 				print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue) ))
                 # Sort the ready queue by estimated_brust_time
-                ready_queue.sort(key=sort_function())
+                ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
                 # switch out
                 print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready_queue(ready_queue) ))
             context_switch_count += 1
@@ -101,7 +98,7 @@ def SRT(processes,cst):
 			if process.getStatus == "IO":
 				process.finishIO(time)
 			ready_queue.append(process_table[process_name])
-			ready_queue.sort(key=sort_function())
+			ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
 			print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
             if len(ready_queue) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_queue.pop(0)
