@@ -200,7 +200,7 @@ def SJF(processes, cst):
                 process.startContextSwitchIn(time)
                 current_running = process_name
         else:
-			print("ERROR: <error-text-here>")
+            print("ERROR: <error-text-here>")
             return
 def SRT(processes):
 	pass
