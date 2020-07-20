@@ -273,8 +273,8 @@ def SRT(processes,cst):
             if process.total_bursts-process.index-1 == 0:
                 event_queue.put((time,(process_name, "EnterQueue")))
             else:
-                event_queue.put((time + expected, (process_name, "EnterIO")))
-                CPU_vacant_at = time + expected + cst
+                event_queue.put((time + cst, (process_name, "EnterIO")))
+                CPU_vacant_at = time + cst
                 if process.total_bursts-process.index-1 == 1:
                     print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
                 else:
@@ -290,6 +290,8 @@ def SRT(processes,cst):
 
         elif event_type == "EnterIO":
             expected = process.finishRunning(time)
+            print(time)
+            print(expected)
             if expected == -1:
                 print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
                 del process_table[process_name]
@@ -305,6 +307,7 @@ def SRT(processes,cst):
         
         elif event_type == "EnterQueue":
             if process.getStatus() == "IO":
+                print(time)
                 process.finishIO(time)
             ready_queue.append(process_table[process_name])
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
