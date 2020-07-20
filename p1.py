@@ -152,6 +152,7 @@ def SJF(processes, cst):
         if event_type == "Arrive":
             process.arrive()
             ready_queue.append(process_name)
+            # Sort the ready state by estimated_brust_time
             ready_state.append(process)
             ready_state.sort(key=operator.attrgetter('estimated_brust_time'))
             print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
@@ -198,9 +199,11 @@ def SJF(processes, cst):
         elif event_type == "EnterQueue":
             process.finishIO(time)
             ready_queue.append(process_name)
-            print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
-            if len(ready_queue) == 1 and current_running == None and time >= CPU_vacant_at:
+            ready_state.append(process)
+            print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
+            if len(ready_state) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_queue.pop(0)
+                ready_state.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
                 current_running = process_name
