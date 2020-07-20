@@ -34,8 +34,8 @@ class Process():
     def getStatus(self):
         return self.status
 
-    def getEstimatedRemaining(self):
-        return self.estimated_remaining_burst_time
+    def getEstimatedRemaining(self,time):
+        return self.startRunning(time) - time
 
     def getTotalBurstTime(self):
         ans = 0

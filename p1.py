@@ -299,7 +299,7 @@ def SRT(processes,cst):
                 event_queue.put((time+expected, (process_name, "EnterQueue")))
             current_running = None
             if len(ready_queue) > 0:
-                new_name = ready_queue.pop(0)
+                new_name = ready_queue.pop(0).getName()
                 new_process = process_table[new_name]
                 event_queue.put((time+cst, (new_name, "Run")))
                 new_process.startContextSwitchIn(time)
@@ -312,6 +312,9 @@ def SRT(processes,cst):
             ready_queue.append(process_table[process_name])
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
             print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
+            if current_running != None:
+                print(current_running.getEstimatedRemaining())
+            print(process.getEstimatedRemaining())
             if len(ready_queue) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
