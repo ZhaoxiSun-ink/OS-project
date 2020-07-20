@@ -108,7 +108,7 @@ def FCFS(processes, cst):
 
 #arg line - python3 p1.py 5 2 0.05 256 4 0.5 128 3
 def SJF(processes, cst):
-    # convert the ready_queue list to string
+    # convert the ready_state list to string
     def print_ready(ready_list):
         if len(ready_list) == 0:
             return "<empty>"
@@ -128,7 +128,6 @@ def SJF(processes, cst):
 
     #waiting_queue, sorted by arrival time
     process_table = dict()
-    ready_queue = list()
     ready_state = list()
     event_queue = PriorityQueue()
     time = 0
@@ -151,13 +150,12 @@ def SJF(processes, cst):
         process = process_table[process_name]
         if event_type == "Arrive":
             process.arrive()
-            ready_queue.append(process_name)
             # Sort the ready state by estimated_brust_time
             ready_state.append(process)
-            ready_state.sort(key=operator.attrgetter('estimated_brust_time'))
+            ready_state.sort(key=operator.attrgetter('estimated_brust_time', 'name'))
+
             print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) != 0 and (current_running == None or time >= CPU_vacant_at):
-                ready_queue.pop(0)
                 ready_state.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
@@ -171,13 +169,13 @@ def SJF(processes, cst):
             process.startContextSwitchOut(time)
             event_queue.put((time + cst, (process_name, "EnterIO")))
             print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready(ready_state) ))
+            # recaculate_tau:
+            recaculate_tau(process, process.index)
+            print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready(ready_state) ))
+            # Sort the ready state by estimated_brust_time
+            ready_state.sort(key=operator.attrgetter('estimated_brust_time', 'name'))
+            #sorted(ready_state, key=lambda ready_state: process.estimated_brust_time)
             if process.index < process.total_bursts - 1:
-                # recaculate_tau:
-                recaculate_tau(process, process.index)
-                print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready(ready_state) ))
-                # Sort the ready state by estimated_brust_time
-                ready_state.sort(key=operator.attrgetter('estimated_brust_time'))
-                #sorted(ready_state, key=lambda ready_state: process.estimated_brust_time)
                 # switch out
                 print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready(ready_state) ))
             context_switch_count += 1
@@ -198,11 +196,11 @@ def SJF(processes, cst):
                 current_running = new_name
         elif event_type == "EnterQueue":
             process.finishIO(time)
-            ready_queue.append(process_name)
             ready_state.append(process)
+            # Sort the ready state by estimated_brust_time
+            ready_state.sort(key=operator.attrgetter('estimated_brust_time', 'name'))
             print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) == 1 and current_running == None and time >= CPU_vacant_at:
-                ready_queue.pop(0)
                 ready_state.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
@@ -210,7 +208,7 @@ def SJF(processes, cst):
         else:
             print("ERROR: <error-text-here>")
             return
-            
+
 def SRT(processes):
 	pass
 
