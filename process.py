@@ -117,6 +117,12 @@ class Process():
         self.status = "Ready"
         self.waiting_times.append((time, -1))
 
+    def preemptDuringCSIn(self, time):
+        assert self.status == "Context_Switch_In"
+        self.status = "Ready"
+        self.turnaround_times.pop()
+        self.waiting_times.append((time, -1))
+
     # Process finishes CPU burst.
     # Requires: Process must be at "Context_Switch_Out" status
     # Modifies: Changes status to "IO"; Find last tuple in turnaround_times (stop turnaround timer)
@@ -144,7 +150,7 @@ class Process():
         self.index += 1
 
     def getEstimatedRemaining(self,time):
-        return self.startRunning(time) - time
+        return self.remaining_burst_times[self.index]
 
 if __name__ == "__main__":
     n = "Process"
