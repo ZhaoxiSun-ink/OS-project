@@ -34,9 +34,6 @@ class Process():
     def getStatus(self):
         return self.status
 
-    def getEstimatedRemaining(self,time):
-        return self.startRunning(time) - time
-
     def getTotalBurstTime(self):
         ans = 0
         for burst in self.burst_times:
@@ -145,6 +142,9 @@ class Process():
         self.status = "Ready"
         self.waiting_times.append((time, -1))
         self.index += 1
+
+    def getEstimatedRemaining(self,time):
+        return self.startRunning(time) - time
 
 if __name__ == "__main__":
     n = "Process"
