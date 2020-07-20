@@ -220,11 +220,11 @@ def SRT(processes,cst):
     
     def recalculate_tau(process,index):
         tau_i = math.ceil(alpha * process.burst_times[index] + (1-alpha) * process.estimated_burst_time)
-        process.estimated_brust_time = tau_i
+        process.estimated_burst_time = tau_i
     
     #initalize all process
     for p in processes:
-        p.estimated_brust_time = 1/parameter
+        p.estimated_burst_time = 1/parameter
     
     #waiting_queue, sorted by arrival time
     process_table = dict()
@@ -282,7 +282,7 @@ def SRT(processes,cst):
                 if process.index < process.total_bursts -1:
                     recalculate_tau(process,process.index) #recaculate_tau
                     print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue) ))
-                    # Sort the ready queue by estimated_brust_time
+                    # Sort the ready queue by estimated_burst_time
                     ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
                     # switch out
                     print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready_queue(ready_queue) ))
