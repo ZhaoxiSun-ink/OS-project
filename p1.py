@@ -326,7 +326,7 @@ if __name__ == '__main__':
 	alpha = float(sys.argv[6])
 	t_slice = float(sys.argv[7])
 	rradd = "END"
-	if sys.argv >= 9:
+	if len(sys.argv) >= 9:
 		rradd = sys.argv[8]
 
 	processes = []
