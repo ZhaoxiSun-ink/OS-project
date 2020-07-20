@@ -144,7 +144,7 @@ class Process():
         self.index += 1
 
     def getEstimatedRemaining(self,time):
-        return self.startRunning(time) - time
+        return self.remaining_burst_times[self.index]
 
 if __name__ == "__main__":
     n = "Process"
