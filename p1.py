@@ -523,7 +523,7 @@ def RR(processes, cst, t_slice, rradd):
         else:
             print("ERROR: <error-text-here>")
             return
-    print("time {}ms: Simulator ended for FCFS [Q <empty>]".format(time))
+    print("time {}ms: Simulator ended for RR [Q <empty>]".format(time))
     
 
 #main part
