@@ -458,7 +458,7 @@ def RR(processes, cst, t_slice, rradd):
 			else:
 				event_queue.put((time + actual, 0, (process_name, "CSOut", 0)))
 			CPU_vacant_at = time + actual + cst
-			if True: #time <= 1000:
+			if time <= 1000:
 				print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))				
 		elif event_type == "CSOut":
 			# if preemption occurs
@@ -469,7 +469,7 @@ def RR(processes, cst, t_slice, rradd):
 					#print("{}  0".format(process.cpu_end_timestamp))					
 					#print("{}  1".format(process.remaining_burst_times[process.index]))
 					event_queue.put((time + cst, 1, (process_name, "EnterIO", 1)))
-					if True: #time <= 1000:
+					if time <= 1000:
 						print("time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]".format(time, process_name, process.remaining_burst_times[process.index], printwq(waiting_queue)))
 				else:
 					t = process.remaining_burst_times[process.index]
@@ -478,23 +478,22 @@ def RR(processes, cst, t_slice, rradd):
 						t = t_slice
 					#print("{}  3".format(t))
 					process.status = "Running"
-					if True: #time <= 1000:
+					if time <= 1000:
 						print("time {}ms: Time slice expirt; no preemption because ready queue is empty [Q {}]".format(time, printwq(waiting_queue)))
 					#process.remaining_burst_times[process.index] -= t
 					#process.cpu_start_timestamp += t
 					#print("{}  4".format(process.remaining_burst_times[process.index]))
 					if process.remaining_burst_times[process.index] == 0:
-						event_queue.put((time + t, 0, (process_name, "EnterIO", 0)))
-						process.status = "Context_Switch_Out"
+						event_queue.put((time + t, 0, (process_name, "CSOut", 0)))
 					else:
 						event_queue.put((time + t, 0, (process_name, "CSOut", 1)))
 			else:
 				process.startContextSwitchOut(time)
 				event_queue.put((time + cst, 1, (process_name, "EnterIO", 0)))
 				remaining_bursts = process.total_bursts-process.index-1
-				if True: #remaining_bursts > 1 and time <= 1000:
+				if remaining_bursts > 1 and time <= 1000:
 					print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, remaining_bursts, printwq(waiting_queue)))
-				elif True: #remaining_bursts == 1 and time <= 1000:
+				elif remaining_bursts == 1 and time <= 1000:
 					print("time {}ms: Process {} completed a CPU burst; 1 burst to go [Q {}]".format(time, process_name, printwq(waiting_queue)))
 				elif remaining_bursts == 0:
 					print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
@@ -525,7 +524,7 @@ def RR(processes, cst, t_slice, rradd):
 		elif event_type == "EnterQueue":
 			process.finishIO(time)
 			waiting_queue.append(process_name)
-			if True: #time <= 1000:
+			if time <= 1000:
 				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
 			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
@@ -536,6 +535,7 @@ def RR(processes, cst, t_slice, rradd):
 			print("ERROR: <error-text-here>")
 			return
 	print("time {}ms: Simulator ended for FCFS [Q <empty>]".format(time))
+	
 
 #main part
 if __name__ == '__main__':
