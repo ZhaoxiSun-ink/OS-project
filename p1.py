@@ -173,8 +173,8 @@ def SJF(processes, cst):
             # Sort the ready state by estimated_burst_time
             ready_state.append(process)
             ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
-            #if time <= 1000:
-            print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
+            if time <= 1000:
+                print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) != 0 and (current_running == None or time >= CPU_vacant_at):
                 ready_state.pop(0)
                 event_queue.put((time + cst, 2, process_name, "Run"))
@@ -184,8 +184,8 @@ def SJF(processes, cst):
             expected = process.startRunning(time)
             event_queue.put((time + expected, 0, process_name, "CSOut"))
             CPU_vacant_at = time + expected + cst
-            #if time <= 1000:
-            print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready(ready_state) ))
+            if time <= 1000:
+                print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready(ready_state) ))
         elif order_num == 0:
             process.startContextSwitchOut(time)
             event_queue.put((time + cst, 1, process_name, "EnterIO"))
@@ -228,8 +228,8 @@ def SJF(processes, cst):
             ready_state.append(process)
             # Sort the ready state by estimated_burst_time
             ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
-            #if time <= 1000:
-            print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
+            if time <= 1000:
+                print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_state.pop(0)
                 event_queue.put((time + cst, 2, process_name, "Run"))
