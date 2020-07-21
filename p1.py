@@ -15,100 +15,100 @@ letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
 
 #check upper_bound
 def checkUpperBound(upper):
-	while(True):
-		temp = math.ceil(-(math.log(generator.drand())) / parameter)
-		if(temp > upper):
-			continue
-		else:
-			return temp
+    while(True):
+        temp = math.ceil(-(math.log(generator.drand())) / parameter)
+        if(temp > upper):
+            continue
+        else:
+            return temp
 
 def FCFS(processes, cst):
-	def printwq(waitq):
-		if len(waitq) == 0:
-			return "<empty>"
-		ans = waitq[0]
-		for i in range(1, len(waitq)):
-			ans = ans + " " + waitq[i]
-		return ans
-	# preprocessing
-	process_table = {}
-	waiting_queue = []
-	event_queue = PriorityQueue()
-	time = 0
-	current_running = None
-	CPU_vacant_at = -1
-	context_switch_count = 0
-	# push all processes to event_queue
-	for process in processes:
-		arrival_time = process.getArrivalTime()
-		name = process.getName()
-		event_queue.put((arrival_time, 4, name, "Arrive"))
-		process_table[name] = process
-		print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
-	print("time 0ms: Simulator started for FCFS [Q <empty>]")
-	while(len(process_table) > 0):
-		next_event = event_queue.get(block=False)
-		time = int(next_event[0])
-		process_name = next_event[2]
-		event_type = next_event[3]
-		process = process_table[process_name]
-		if event_type == "Arrive":
-			process.arrive()
-			waiting_queue.append(process_name)
-			if time <= 1000:
-				print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
-				waiting_queue.pop(0)
-				event_queue.put((time + cst, 2, process_name, "Run"))
-				process.startContextSwitchIn(time)
-				current_running = process_name
-		elif event_type == "Run":
-			expected = process.startRunning(time)
-			event_queue.put((time + expected, 0, process_name, "CSOut"))
-			CPU_vacant_at = time + expected + cst
-			if time <= 1000:
-				print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))
-		elif event_type == "CSOut":
-			process.startContextSwitchOut(time)
-			event_queue.put((time + cst, 1, process_name, "EnterIO"))
-			remaining_bursts = process.total_bursts-process.index-1
-			if remaining_bursts > 1 and time <= 1000:
-				print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, remaining_bursts, printwq(waiting_queue)))
-			elif remaining_bursts == 1 and time <= 1000:
-				print("time {}ms: Process {} completed a CPU burst; 1 burst to go [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			elif remaining_bursts == 0:
-				print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if process.index < process.total_bursts - 1 and time <= 1000:
-				print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
-			context_switch_count += 1
-		elif event_type == "EnterIO":
-			expected = process.finishRunning(time)
-			if expected == -1:
-				del process_table[process_name]
-			else:
-				event_queue.put((time + expected, 3, process_name, "EnterQueue"))
-			current_running = None
-			# Start running another immediately, if there is another one on the waiting queue
-			if len(waiting_queue) > 0:
-				new_name = waiting_queue.pop(0)
-				new_process = process_table[new_name]
-				event_queue.put((time + cst, 2, new_name, "Run"))
-				new_process.startContextSwitchIn(time)
-				current_running = new_name
-		elif event_type == "EnterQueue":
-			process.finishIO(time)
-			waiting_queue.append(process_name)
-			if time <= 1000:
-				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
-				waiting_queue.pop(0)
-				event_queue.put((time + cst, 2, process_name, "Run"))
-				process.startContextSwitchIn(time)
-				current_running = process_name
-		else:
-			print("ERROR: <error-text-here>")
-			return
-	print("time {}ms: Simulator ended for FCFS [Q <empty>]".format(time))
+    def printwq(waitq):
+        if len(waitq) == 0:
+            return "<empty>"
+        ans = waitq[0]
+        for i in range(1, len(waitq)):
+            ans = ans + " " + waitq[i]
+        return ans
+    # preprocessing
+    process_table = {}
+    waiting_queue = []
+    event_queue = PriorityQueue()
+    time = 0
+    current_running = None
+    CPU_vacant_at = -1
+    context_switch_count = 0
+    # push all processes to event_queue
+    for process in processes:
+        arrival_time = process.getArrivalTime()
+        name = process.getName()
+        event_queue.put((arrival_time, 4, name, "Arrive"))
+        process_table[name] = process
+        print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
+    print("time 0ms: Simulator started for FCFS [Q <empty>]")
+    while(len(process_table) > 0):
+        next_event = event_queue.get(block=False)
+        time = int(next_event[0])
+        process_name = next_event[2]
+        event_type = next_event[3]
+        process = process_table[process_name]
+        if event_type == "Arrive":
+            process.arrive()
+            waiting_queue.append(process_name)
+            if time <= 1000:
+                print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
+            if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
+                waiting_queue.pop(0)
+                event_queue.put((time + cst, 2, process_name, "Run"))
+                process.startContextSwitchIn(time)
+                current_running = process_name
+        elif event_type == "Run":
+            expected = process.startRunning(time)
+            event_queue.put((time + expected, 0, process_name, "CSOut"))
+            CPU_vacant_at = time + expected + cst
+            if time <= 1000:
+                print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))
+        elif event_type == "CSOut":
+            process.startContextSwitchOut(time)
+            event_queue.put((time + cst, 1, process_name, "EnterIO"))
+            remaining_bursts = process.total_bursts-process.index-1
+            if remaining_bursts > 1 and time <= 1000:
+                print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, remaining_bursts, printwq(waiting_queue)))
+            elif remaining_bursts == 1 and time <= 1000:
+                print("time {}ms: Process {} completed a CPU burst; 1 burst to go [Q {}]".format(time, process_name, printwq(waiting_queue)))
+            elif remaining_bursts == 0:
+                print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
+            if process.index < process.total_bursts - 1 and time <= 1000:
+                print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
+            context_switch_count += 1
+        elif event_type == "EnterIO":
+            expected = process.finishRunning(time)
+            if expected == -1:
+                del process_table[process_name]
+            else:
+                event_queue.put((time + expected, 3, process_name, "EnterQueue"))
+            current_running = None
+            # Start running another immediately, if there is another one on the waiting queue
+            if len(waiting_queue) > 0:
+                new_name = waiting_queue.pop(0)
+                new_process = process_table[new_name]
+                event_queue.put((time + cst, 2, new_name, "Run"))
+                new_process.startContextSwitchIn(time)
+                current_running = new_name
+        elif event_type == "EnterQueue":
+            process.finishIO(time)
+            waiting_queue.append(process_name)
+            if time <= 1000:
+                print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
+            if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
+                waiting_queue.pop(0)
+                event_queue.put((time + cst, 2, process_name, "Run"))
+                process.startContextSwitchIn(time)
+                current_running = process_name
+        else:
+            print("ERROR: <error-text-here>")
+            return
+    print("time {}ms: Simulator ended for FCFS [Q <empty>]".format(time))
 
 
 # Shortest Job First (SJF) algorithm
@@ -231,6 +231,8 @@ def SJF(processes, cst):
             print("ERROR: <error-text-here>")
             return
     print( "time {}ms: Simulator ended for SJF [Q <empty>]".format(time) )
+
+
 def SRT(processes,cst):
     def print_ready_queue(waitq):
         if len(waitq) == 0:
@@ -255,54 +257,83 @@ def SRT(processes,cst):
     event_queue = PriorityQueue()
     time = 0
     current_running = None
-    CPU_vacant_at = -1
     context_switch_count = 0
     #put all processes into event_queue
     for process in processes:
         arrival_time = process.getArrivalTime()
         name = process.getName()
-        event_queue.put((arrival_time,(name,"Arrive")))
+        event_queue.put((arrival_time, 4, name, "Arrive"))
         process_table[name] = process
         print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), process.getEstimatedBurstTime() ))
     print("time 0ms: Simulator started for SRT [Q <empty>]")
 
     while(len(process_table) > 0):
-        next_event = event_queue.get()
+        print(process_table["B"].status)
+        next_event = event_queue.get(block=False)
         time = int(next_event[0])
-        process_name = next_event[1][0]
-        event_type = next_event[1][1]
+        process_name = next_event[2]
+        event_type = next_event[3]
         process = process_table[process_name]
-        print(event_type)
         #arrive
         if event_type == "Arrive":
             process.arrive()
             ready_queue.append(process_table[process_name])
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
             print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
-            if len(ready_queue) != 0 and (current_running == None and time >= CPU_vacant_at):
+            # Fastest process in the queue
+            candidate = ready_queue[0]
+            # Nothing running now, just start
+            if len(ready_queue) == 1 and (current_running == None):
                 ready_queue.pop(0)
-                event_queue.put((time+cst,(process_name,"Run")))
+                event_queue.put((time + cst, 2, process_name, "Run"))
                 process.startContextSwitchIn(time)
                 current_running = process
+            else:
+                if candidate.getEstimatedRemaining() < current_running.getEstimatedRemaining():
+                    # if current running is running, just preempt
+                    if current_running.getStatus() == "Running":
+                        current_running.startContextSwitchOut(time)
+                        ignore_list.append(current_running)
+                        if(current_running.remaining_burst_times[current_running.index] > 0):
+                            event_queue.put((time + cst, 1, current_running.getName(), "EnterQueue"))
+                            print("0Process will preempt current running process.")
+                        else:
+                            event_queue.put((time + cst, 1, current_running.getName(), "EnterIO"))
+                            print("0Process will preempt current running process, IO")
+                        
+                    # if current running is still switching in, do nothing
+                    # if current running is switching out, do nothing
         #run
         elif event_type == "Run":
-            print(time)
-            print(process.getStatus())
-            expected = process.startRunning(time)
-            event_queue.put((time + expected, (process_name, "CSOut")))
-            CPU_vacant_at = time + expected + cst
-            print(time+expected)
-            print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
+            # If best candidate can preempt current process to be run, do it
+            if len(ready_queue) == 0:
+                expected = process.startRunning(time)
+                event_queue.put((time + expected, 0, process_name, "CSOut"))
+                print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
+                continue
+            candidate_name = ready_queue[0]
+            candidate = process_table[candidate_name]
+            if candidate.getEstimatedRemaining() < process.getEstimatedRemaining():
+                process.startContextSwitchOut(time)
+                event_queue.push((time + cst, 1, process, "EnterQueue"))
+                print("Best candidate will preempt current running process")
+            else:
+                expected = process.startRunning(time)
+                event_queue.put((time + expected, 0, process_name, "CSOut"))
+                print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
 
         elif event_type == "CSOut":
-            if next_event in ignore_list:
-                ignore_list.pop(0)
+            if process in ignore_list:
+                ignore_list.pop(ignore_list.index(process))
                 continue
+            print(process.name, process.status)
             process.startContextSwitchOut(time)
-            if process.total_bursts-process.index-1 == 0:
-                event_queue.put((time,(process_name, "EnterIO")))
+            print("Remainning", process.remaining_burst_times[process.index])
+            if process.remaining_burst_times[process.index] == 0:
+                event_queue.put((time + cst, 1, process_name, "EnterIO"))
             else:
-                event_queue.put((time + cst, (process_name, "EnterIO")))
+                event_queue.put((time + cst, 3, process_name, "EnterQueue"))
+            if process.total_bursts-process.index-1 > 0:
                 CPU_vacant_at = time + cst
                 if process.total_bursts-process.index-1 == 1:
                     print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
@@ -318,230 +349,221 @@ def SRT(processes,cst):
                 context_switch_count += 1
 
         elif event_type == "EnterIO":
+            print("Remaining time", process_name, process.remaining_burst_times[process.index])
             expected = process.finishRunning(time)
-            print(time)
-            print(expected)
             if expected == -1:
                 print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
                 del process_table[process_name]
             else:
-                event_queue.put((time+expected, (process_name, "EnterQueue")))
+                event_queue.put((time+expected, 3, process_name, "EnterQueue"))
             current_running = None
+            # immediately add something to the CPU
             if len(ready_queue) > 0:
                 new_name = ready_queue.pop(0).getName()
                 new_process = process_table[new_name]
-                event_queue.put((time+cst, (new_name, "Run")))
+                event_queue.put((time+cst, 2, new_name, "Run"))
                 new_process.startContextSwitchIn(time)
                 current_running = new_process
 
         elif event_type == "EnterQueue":
             if process.getStatus() == "IO":
-                print(time)
                 process.finishIO(time)
+                print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
+            if process.getStatus() == "Context_Switch_Out":
+                process.preempt(time)
             ready_queue.append(process_table[process_name])
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
-            print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
-            if current_running != None:
-                print(current_running.getStatus())
-                print(current_running.getEstimatedRemaining(time))
-                print(current_running.getEstimatedRemaining(time) > process.getEstimatedRemaining(time))
-            print(process.getEstimatedRemaining(time))
-            if len(ready_queue) == 1 and current_running == None and time >= CPU_vacant_at:
-                ready_queue.pop(0)
-                event_queue.put((time + cst, (process_name, "Run")))
-                process.startContextSwitchIn(time)
-                current_running = process
-            if current_running != None and (current_running.getStatus() == "Running" or current_running.getStatus() == "Context_Switch_In") and current_running.getEstimatedRemaining(time) > process.getEstimatedRemaining(time):
-                print("preemption")
-                ready_queue.pop(0)
-                event_queue.put((time + 2*cst, (process_name, "Run")))
-                process.startContextSwitchIn(time+cst)
-                preemption_process = current_running
-                current_running = process
-                event_queue.put((time+cst,(preemption_process.getName(),"EnterQueue")))
-                if preemption_process.getStatus() == "Running":
-                    preemption_process.startContextSwitchOut(time)
-                    preemption_process.preempt(time+cst)
-<<<<<<< HEAD
-                elif preemption_process.getStatus() == "Context_Switch_In":
-                    # Current process enter queue
-                    # Push a preempt event to event queue
-                    # In a preempt event, current process pushes a "Run" to event queue at time + cst
-                    event_queue.put(time+1, )
-=======
-                elif current_running.getStatus() == "Context_Switch_In":
-
->>>>>>> 10439f2236d764c5f3a0f2afadd8f701ef1e9aca
-                should_finish_time = time + preemption_process.getEstimatedRemaining(time)
-                ignore_list.append((should_finish_time,(preemption_process.getName(),"CSOut")))
-
+            
+            # Fastest process in the queue
+            candidate = ready_queue[0]
+            # Nothing running now, just start
+            if len(ready_queue) == 1 and (current_running == None):
+                new_process = ready_queue.pop(0)
+                event_queue.put((time + cst, 2, new_process.getName(), "Run"))
+                new_process.startContextSwitchIn(time)
+                current_running = new_process
+            else:
+                if candidate.getEstimatedRemaining() < current_running.getEstimatedRemaining():
+                    # if current running is running, just preempt
+                    if current_running.getStatus() == "Running":
+                        current_running.startContextSwitchOut(time)
+                        ignore_list.append(current_running)
+                        if(current_running.remaining_burst_times[current_running.index] > 0):
+                            event_queue.put((time + cst, 1, current_running.getName(), "EnterQueue"))
+                            print("time {}ms: Process {} (tau {}ms) will preempt {} [Q {}]".format(time, process_name, process.getEstimatedRemaining(), current_running.getName(), print_ready_queue(ready_queue)))
+                        else:
+                            event_queue.put((time + cst, 1, current_running.getName(), "EnterIO"))
+                            print("Process will preempt current running process, IO")
+                        
+                    # if current running is still switching in, do nothing
+                    # if current running is switching out, do nothing
         else:
             print("ERROR: <error-text-here>")
             return
 
 
 def RR(processes):
-	def printwq(waitq):
-		if len(waitq) == 0:
-			return "<empty>"
-		ans = waitq[0]
-		for i in range(1, len(waitq)):
-			ans = ans + " " + waitq[i]
-		return ans
-	# preprocessing
-	process_table = {}
-	waiting_queue = []
-	event_queue = PriorityQueue()
-	time = 0
-	current_running = None
-	CPU_vacant_at = -1
-	context_switch_count = 0
-	# push all processes to event_queue
-	for process in processes:
-		arrival_time = process.getArrivalTime()
-		name = process.getName()
-		event_queue.put((arrival_time, (name, "Arrive")))
-		process_table[name] = process
-		print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
-	print("time 0ms: Simulator started for RR [Q <empty>]")
-	while(len(process_table) > 0):
-		next_event = event_queue.get(block=False)
-		time = int(next_event[0])
-		process_name = next_event[1][0]
-		event_type = next_event[1][1]
-		process = process_table[process_name]
-		if event_type == "Arrive":
-			process.arrive()
-			waiting_queue.append(process_name)
-			if time <= 1000:
-				print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
-				waiting_queue.pop(0)
-				event_queue.put((time + cst, (process_name, "Run", 0)))
-				process.startContextSwitchIn(time)
-				current_running = process_name
-		elif event_type == "Run":
-			if next_event[1][2] == 1:
-				process.startContextSwitchIn(time)
-				current_running = process_name
-			expected = process.startRunning(time)
-			actual = expected
-			if expected > t_slice and len(waiting_queue) > 0:
-				# preemption occurs
-				actual = t_slice
-				preemption = 1
-				event_queue.put((time + actual, (process_name, "CSOut", 1)))
-			else:
-				event_queue.put((time + actual, (process_name, "CSOut", 0)))
-			CPU_vacant_at = time + actual + cst
-			if time <= 1000:
-				print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))
-		elif event_type == "CSOut":
-			process.startContextSwitchOut(time)
-			# if preemption occurs
-			if next_event[1][2] == 1:
-				event_queue.put((time + cst, (process_name, "EnterIO", 1)))
-				if time <= 1000:
-					print("time {}ms: Time slice expired; process {} preempted with {} to go [Q {}]".format(time, process_name, process.remaining_burst_times[process.index], printwq(waiting_queue)))
-			else:
-				event_queue.put((time + cst, (process_name, "EnterIO", 0)))
-				if time <= 1000:
-					print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.total_bursts-process.index-1, printwq(waiting_queue)))
-				if process.index < process.total_bursts - 1:
-					if time <= 1000:
-						print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
-			context_switch_count += 1
-		elif event_type == "EnterIO":
-			if next_event[1][2] == 1:
-				process.preempt(time)
-				if rradd == "END":
-					waiting_queue.append(process_name)
-				else:
-					waiting_queue.insert(0, process_name)
-			else:
-				expected = process.finishRunning(time)
-				if expected == -1:
-					print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
-					del process_table[process_name]
-				else:
-					event_queue.put((time + expected, (process_name, "EnterQueue")))
-			current_running = None
-			# Start running another immediately, if there is another one on the waiting queue
-			if len(waiting_queue) > 0:
-				new_name = waiting_queue.pop(0)
-				new_process = process_table[new_name]
-				event_queue.put((time + cst, (new_name, "Run", 0)))
-				new_process.startContextSwitchIn(time)
-				current_running = new_name
-		elif event_type == "EnterQueue":
-			process.finishIO(time)
-			waiting_queue.append(process_name)
-			if time <= 1000:
-				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
-			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
-				waiting_queue.pop(0)
-				event_queue.put((time + cst, (process_name, "Run", 0)))
-				process.startContextSwitchIn(time)
-				current_running = process_name
-		else:
-			print("ERROR: <error-text-here>")
-			return
+    def printwq(waitq):
+        if len(waitq) == 0:
+            return "<empty>"
+        ans = waitq[0]
+        for i in range(1, len(waitq)):
+            ans = ans + " " + waitq[i]
+        return ans
+    # preprocessing
+    process_table = {}
+    waiting_queue = []
+    event_queue = PriorityQueue()
+    time = 0
+    current_running = None
+    CPU_vacant_at = -1
+    context_switch_count = 0
+    # push all processes to event_queue
+    for process in processes:
+        arrival_time = process.getArrivalTime()
+        name = process.getName()
+        event_queue.put((arrival_time, (name, "Arrive")))
+        process_table[name] = process
+        print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
+    print("time 0ms: Simulator started for RR [Q <empty>]")
+    while(len(process_table) > 0):
+        next_event = event_queue.get(block=False)
+        time = int(next_event[0])
+        process_name = next_event[1][0]
+        event_type = next_event[1][1]
+        process = process_table[process_name]
+        if event_type == "Arrive":
+            process.arrive()
+            waiting_queue.append(process_name)
+            if time <= 1000:
+                print("time {}ms: Process {} arrived; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
+            if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
+                waiting_queue.pop(0)
+                event_queue.put((time + cst, (process_name, "Run", 0)))
+                process.startContextSwitchIn(time)
+                current_running = process_name
+        elif event_type == "Run":
+            if next_event[1][2] == 1:
+                process.startContextSwitchIn(time)
+                current_running = process_name
+            expected = process.startRunning(time)
+            actual = expected
+            if expected > t_slice and len(waiting_queue) > 0:
+                # preemption occurs
+                actual = t_slice
+                preemption = 1
+                event_queue.put((time + actual, (process_name, "CSOut", 1)))
+            else:
+                event_queue.put((time + actual, (process_name, "CSOut", 0)))
+            CPU_vacant_at = time + actual + cst
+            if time <= 1000:
+                print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))
+        elif event_type == "CSOut":
+            process.startContextSwitchOut(time)
+            # if preemption occurs
+            if next_event[1][2] == 1:
+                event_queue.put((time + cst, (process_name, "EnterIO", 1)))
+                if time <= 1000:
+                    print("time {}ms: Time slice expired; process {} preempted with {} to go [Q {}]".format(time, process_name, process.remaining_burst_times[process.index], printwq(waiting_queue)))
+            else:
+                event_queue.put((time + cst, (process_name, "EnterIO", 0)))
+                if time <= 1000:
+                    print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.total_bursts-process.index-1, printwq(waiting_queue)))
+                if process.index < process.total_bursts - 1:
+                    if time <= 1000:
+                        print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
+            context_switch_count += 1
+        elif event_type == "EnterIO":
+            if next_event[1][2] == 1:
+                process.preempt(time)
+                if rradd == "END":
+                    waiting_queue.append(process_name)
+                else:
+                    waiting_queue.insert(0, process_name)
+            else:
+                expected = process.finishRunning(time)
+                if expected == -1:
+                    print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
+                    del process_table[process_name]
+                else:
+                    event_queue.put((time + expected, (process_name, "EnterQueue")))
+            current_running = None
+            # Start running another immediately, if there is another one on the waiting queue
+            if len(waiting_queue) > 0:
+                new_name = waiting_queue.pop(0)
+                new_process = process_table[new_name]
+                event_queue.put((time + cst, (new_name, "Run", 0)))
+                new_process.startContextSwitchIn(time)
+                current_running = new_name
+        elif event_type == "EnterQueue":
+            process.finishIO(time)
+            waiting_queue.append(process_name)
+            if time <= 1000:
+                print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
+            if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
+                waiting_queue.pop(0)
+                event_queue.put((time + cst, (process_name, "Run", 0)))
+                process.startContextSwitchIn(time)
+                current_running = process_name
+        else:
+            print("ERROR: <error-text-here>")
+            return
 
 #main part
 if __name__ == '__main__':
-	if len(sys.argv) < 8:
-		print("ERROR: Invalid argument.")
-		sys.exit(2)
+    if len(sys.argv) < 8:
+        print("ERROR: Invalid argument.")
+        sys.exit(2)
 
-	n = int(sys.argv[1])
-	seed = int(sys.argv[2])
-	parameter = float(sys.argv[3])
-	upper_bound = float(sys.argv[4])
-	t_cs = float(sys.argv[5])
-	alpha = float(sys.argv[6])
-	t_slice = float(sys.argv[7])
-	rradd = "END"
-	if len(sys.argv) >= 9:
-		rradd = sys.argv[8]
+    n = int(sys.argv[1])
+    seed = int(sys.argv[2])
+    parameter = float(sys.argv[3])
+    upper_bound = float(sys.argv[4])
+    t_cs = float(sys.argv[5])
+    alpha = float(sys.argv[6])
+    t_slice = float(sys.argv[7])
+    rradd = "END"
+    if len(sys.argv) >= 9:
+        rradd = sys.argv[8]
 
-	processes = []
+    processes = []
 
-	#random generator
-	generator = Rand48(0)
-	generator.srand(seed)
+    #random generator
+    generator = Rand48(0)
+    generator.srand(seed)
 
-	for x in range(n):
-		pid = letters[x]
-		while True:
-			tt = generator.drand()
-			temp = math.floor(-(math.log(tt)) / parameter)
-			if temp > upper_bound:
-				continue
-			else:
-				arr = temp
-				break
-		while True:
-			num_burst = math.floor(generator.drand()*100)+1
-			if num_burst > upper_bound:
-				continue
-			else:
-				break
-		burst = []
-		io = []
-		for y in range(num_burst-1):
-			a = checkUpperBound(upper_bound)
-			b = checkUpperBound(upper_bound)
-			burst.append(a)
-			io.append(b)
-		c = checkUpperBound(upper_bound)
-		burst.append(c)
-		process = Process(pid,arr,burst,io)
-		processes.append(process)
+    for x in range(n):
+        pid = letters[x]
+        while True:
+            tt = generator.drand()
+            temp = math.floor(-(math.log(tt)) / parameter)
+            if temp > upper_bound:
+                continue
+            else:
+                arr = temp
+                break
+        while True:
+            num_burst = math.floor(generator.drand()*100)+1
+            if num_burst > upper_bound:
+                continue
+            else:
+                break
+        burst = []
+        io = []
+        for y in range(num_burst-1):
+            a = checkUpperBound(upper_bound)
+            b = checkUpperBound(upper_bound)
+            burst.append(a)
+            io.append(b)
+        c = checkUpperBound(upper_bound)
+        burst.append(c)
+        process = Process(pid,arr,burst,io)
+        processes.append(process)
 processes1 = deepcopy(processes)
 #FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 print()
-SJF(processes2, t_cs/2)
-#SRT(processes3,t_cs/2)
+# SJF(processes2, t_cs/2)
+SRT(processes3, t_cs/2)
