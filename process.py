@@ -157,7 +157,9 @@ class Process():
         return self.remaining_burst_times[self.index]
     
     def alreadyRunTime(self, time):
-        return self.burst_times[self.index] - self.remaining_burst_times[self.index] - (time - self.cpu_start_timestamp)
+        ans = self.burst_times[self.index] - self.remaining_burst_times[self.index]
+        ans += (time - self.cpu_start_timestamp) if self.status == "Running" else 0
+        return ans
 
 if __name__ == "__main__":
     n = "Process"
