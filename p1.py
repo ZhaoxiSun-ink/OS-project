@@ -430,7 +430,7 @@ def RR(processes, cst, t_slice, rradd):
 	for process in processes:
 		arrival_time = process.getArrivalTime()
 		name = process.getName()
-		event_queue.put((arrival_time, 4, (name, "Arrive")))
+		event_queue.put((arrival_time, 4, (name, "Arrive", 0)))
 		process_table[name] = process
 		print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
 	print("time 0ms: Simulator started for RR [Q <empty>]")
@@ -450,45 +450,34 @@ def RR(processes, cst, t_slice, rradd):
 				process.startContextSwitchIn(time)
 				current_running = process_name
 		elif event_type == "Run":
+			if next_event[2][2] == 1:
+				process.startContextSwitchIn(time)
+				current_running = process_name
 			expected = process.startRunning(time)
 			actual = expected
+			'''
+			if time < 1000:#time < 39000 and time > 37000:
+				a = len(waiting_queue) > 0
+				print("ex: {}; t_s: {}; {}".format(expected, t_slice, len(waiting_queue)))
+			'''
 			if expected > t_slice:
+				# preemption occurs
 				actual = t_slice
+				preemption = 1
 				event_queue.put((time + actual, 0, (process_name, "CSOut", 1)))
 			else:
 				event_queue.put((time + actual, 0, (process_name, "CSOut", 0)))
 			CPU_vacant_at = time + actual + cst
-			if time <= 1000:
+			if time <= 1000:#time < 39000 and time > 37000:
 				print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))				
-		elif event_type == "CSOut":
+		elif event_type == "CSOut":				
+			process.startContextSwitchOut(time)
 			# if preemption occurs
 			if next_event[2][2] == 1:
-				if len(waiting_queue) > 0:
-					process.startContextSwitchOut(time)
-					#print("{}  0".format(process.cpu_start_timestamp))
-					#print("{}  0".format(process.cpu_end_timestamp))					
-					#print("{}  1".format(process.remaining_burst_times[process.index]))
-					event_queue.put((time + cst, 1, (process_name, "EnterIO", 1)))
-					if time <= 1000:
-						print("time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]".format(time, process_name, process.remaining_burst_times[process.index], printwq(waiting_queue)))
-				else:
-					t = process.remaining_burst_times[process.index]
-					#print("{}  2".format(t))
-					if t > t_slice:
-						t = t_slice
-					#print("{}  3".format(t))
-					process.status = "Running"
-					if time <= 1000:
-						print("time {}ms: Time slice expirt; no preemption because ready queue is empty [Q {}]".format(time, printwq(waiting_queue)))
-					#process.remaining_burst_times[process.index] -= t
-					#process.cpu_start_timestamp += t
-					#print("{}  4".format(process.remaining_burst_times[process.index]))
-					if process.remaining_burst_times[process.index] == 0:
-						event_queue.put((time + t, 0, (process_name, "CSOut", 0)))
-					else:
-						event_queue.put((time + t, 0, (process_name, "CSOut", 1)))
+				event_queue.put((time + cst, 1, (process_name, "EnterIO", 1)))
+				if time <= 1000:#time < 39000 and time > 37000:
+					print("time {}ms: Time slice expired; process {} preempted with {} to go [Q {}]".format(time, process_name, process.remaining_burst_times[process.index], printwq(waiting_queue)))
 			else:
-				process.startContextSwitchOut(time)
 				event_queue.put((time + cst, 1, (process_name, "EnterIO", 0)))
 				remaining_bursts = process.total_bursts-process.index-1
 				if remaining_bursts > 1 and time <= 1000:
@@ -499,7 +488,7 @@ def RR(processes, cst, t_slice, rradd):
 					print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, printwq(waiting_queue)))
 				if process.index < process.total_bursts - 1 and time <= 1000:
 					print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
-				context_switch_count += 1
+			context_switch_count += 1
 		elif event_type == "EnterIO":
 			if next_event[2][2] == 1:
 				process.preempt(time)
@@ -512,7 +501,7 @@ def RR(processes, cst, t_slice, rradd):
 				if expected == -1:
 					del process_table[process_name]
 				else:
-					event_queue.put((time + expected, 3, (process_name, "EnterQueue")))
+					event_queue.put((time + expected, 3, (process_name, "EnterQueue", 0)))
 			current_running = None
 			# Start running another immediately, if there is another one on the waiting queue
 			if len(waiting_queue) > 0:
@@ -524,7 +513,7 @@ def RR(processes, cst, t_slice, rradd):
 		elif event_type == "EnterQueue":
 			process.finishIO(time)
 			waiting_queue.append(process_name)
-			if time <= 1000:
+			if time <= 1000:#time < 39000 and time > 37000:
 				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, printwq(waiting_queue)))
 			if len(waiting_queue) == 1 and current_running == None and time >= CPU_vacant_at:
 				waiting_queue.pop(0)
