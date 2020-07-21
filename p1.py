@@ -405,12 +405,14 @@ def SRT(processes,cst):
                 event_queue.put((time + cst, 2, candidate.getName(), "Run"))
                 current_running = candidate
 
+            # print(time, process.getStatus())
             if process.getStatus() == "IO":
                 process.finishIO(time)
                 #if time <= 1000:
                 # Fastest process in the queue
                 candidate = ready_queue[0]
                 # Nothing running now, just start running the best thing in queue, probably the newly arriving process
+                # print("No current running" if current_running == None else (current_running.getName(), current_running.status))
                 if current_running == None:
                     print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
                     .format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
@@ -435,8 +437,11 @@ def SRT(processes,cst):
                                 event_queue.put((time + cst, 1, current_running.getName(), "EnterIO"))
                                 #if time <= 1000:
                                 # print("Process will preempt current running process, IO")
-                            # if current running is still switching in, do nothing
-                            # if current running is switching out, do nothing
+                        # if current running is still switching in, just type "we have added process"
+                        elif current_running.getStatus() == "Context_Switch_In":
+                            print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+                            .format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
+                        # if current running is switching out, do nothing
                     else:
                         print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
                             .format(time, process_name,process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
