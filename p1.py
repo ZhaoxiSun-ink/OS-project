@@ -607,8 +607,11 @@ processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 FCFS(processes1, t_cs/2)
+print()
 SJF(processes2, t_cs/2)
+print()
 SRT(processes3,t_cs/2)
+print()
 RR(processes4,t_cs/2,t_slice,rradd)
 FCFS_burst = 0
 FCFS_total_burst = 0
