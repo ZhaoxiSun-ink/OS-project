@@ -18,6 +18,7 @@ class Process():
         self.status = None
         # i-th CPU burst we are now in
         self.index = 0
+        self.preempt_num = 0
         # tmp Variables
         self.cpu_start_timestamp = -1
         self.cpu_end_timestamp = -1
@@ -123,6 +124,7 @@ class Process():
     def preempt(self, time):
         assert self.status == "Context_Switch_Out"
         self.status = "Ready"
+        self.preempt_num += 1
         self.waiting_times.append((time, -1))
 
     # Process finishes CPU burst.
@@ -153,6 +155,9 @@ class Process():
 
     def getEstimatedRemaining(self):
         return self.remaining_burst_times[self.index]
+    
+    def alreadyRunTime(self, time):
+        return self.burst_times[self.index] - self.remaining_burst_times[self.index] - (time - self.cpu_start_timestamp)
 
 if __name__ == "__main__":
     n = "Process"
