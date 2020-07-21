@@ -359,6 +359,7 @@ def SRT(processes,cst):
                     # switch out
                     print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready_queue(ready_queue) ))
                 context_switch_count += 1
+                process.context_switch += 1
 
         elif event_type == "EnterIO":
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
@@ -500,6 +501,7 @@ def RR(processes, cst, t_slice, rradd):
                 if process.index < process.total_bursts - 1 and time <= 1000:
                     print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
             context_switch_count += 1
+            process.context_switch += 1
         elif event_type == "EnterIO":
             if next_event[2][2] == 1:
                 process.preempt(time)
@@ -593,8 +595,9 @@ processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 
-#SJF(processes2, t_cs/2)
+SJF(processes2, t_cs/2)
 SRT(processes3,t_cs/2)
+RR(processes4,t_cs/2,t_slice,rradd)
 # FCSF
 FCFS_burst = 0
 FCFS_total_burst = 0
@@ -619,6 +622,7 @@ SRT_waiting_num = 0
 SRT_around = 0
 SRT_around_num = 0
 SRT_total_context_switch = 0
+SRT_total_preemption = 0
 # RR
 RR_burst = 0
 RR_total_burst = 0
@@ -627,6 +631,7 @@ RR_waiting_num = 0
 RR_around = 0
 RR_around_num = 0
 RR_total_context_switch = 0
+RR_total_preemption = 0 
 # For each process, sum the total
 for i in range(len(processes)):
     # FCSF
@@ -645,7 +650,7 @@ for i in range(len(processes)):
     SJF_around += processes2[i].getTotalTurnaroundTime() 
     SJF_around_num += processes2[i].getTurnAroundTimeNum()
     SJF_total_context_switch += processes2[i].context_switch
-    """
+    
     # SRT
     SRT_burst += processes3[i].getTotalBurstTime()
     SRT_total_burst += processes3[i].getTotalBursts()
@@ -654,6 +659,7 @@ for i in range(len(processes)):
     SRT_around += processes3[i].getTotalTurnaroundTime() 
     SRT_around_num += processes3[i].getTurnAroundTimeNum()
     SRT_total_context_switch += processes3[i].context_switch
+    SRT_total_preemption += processes3[i].preempt_num
     # RR
     RR_burst += processes4[i].getTotalBurstTime()
     RR_total_burst += processes4[i].getTotalBursts()
@@ -662,7 +668,8 @@ for i in range(len(processes)):
     RR_around += processes4[i].getTotalTurnaroundTime() 
     RR_around_num += processes4[i].getTurnAroundTimeNum()
     RR_total_context_switch += processes4[i].context_switch
-    """
+    RR_total_preemption += processes3[i].preempt_num
+    
 # divide by total process number
 FCSF_avg_burst_time  = FCFS_burst / FCFS_total_burst
 FCSF_avg_waiting_time  = FCFS_waiting / FCFS_waiting_num
@@ -672,7 +679,7 @@ SJF_avg_burst_time  = SJF_burst / SJF_total_burst
 SJF_avg_waiting_time  = SJF_waiting / SJF_waiting_num
 SJF_avg_turn_around_time  = (SJF_around+SJF_waiting) / SJF_around_num
 
-"""
+
 SRT_avg_burst_time  = SRT_burst / SRT_total_burst
 SRT_avg_waiting_time  = SRT_waiting / SRT_waiting_num
 SRT_avg_turn_around_time  = (SRT_around+SRT_waiting) / SRT_around_num
@@ -680,7 +687,7 @@ SRT_avg_turn_around_time  = (SRT_around+SRT_waiting) / SRT_around_num
 RR_avg_burst_time  = RR_burst / RR_total_burst
 RR_avg_waiting_time  = RR_waiting / RR_waiting_num
 RR_avg_turn_around_time  = (RR_around+RR_waiting) / RR_around_num
-"""
+
 
 original_stdout = sys.stdout # Save a reference to the original standard output
 with open('simout.txt', 'w') as f:
@@ -700,7 +707,7 @@ with open('simout.txt', 'w') as f:
     print("-- total number of context switches: {}".format(SJF_total_context_switch) )
     print("-- total number of preemptions: 0")
     #
-    """
+    
     print("Algorithm SRT")
     print("-- average CPU burst time: {:.3f} ms".format(SRT_avg_burst_time) )
     print("-- average wait time: {:.3f} ms".format(SRT_avg_waiting_time) )
@@ -714,5 +721,5 @@ with open('simout.txt', 'w') as f:
     print("-- average turnaround time: {:.3f} ms".format(RR_avg_turn_around_time) )
     print("-- total number of context switches: {}".format(RR_total_context_switch) )
     print("-- total number of preemptions: {}".format(RR_total_preemption) )
-    """
+    
     sys.stdout = original_stdout # Reset the standard output to its original value
