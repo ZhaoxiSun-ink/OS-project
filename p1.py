@@ -330,9 +330,9 @@ def SRT(processes,cst):
             #print("candidate here is ", candidate.getName())
             #print(candidate.getEstimatedBurstTime() , process.getEstimatedBurstTime())
             if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < process.getEstimatedBurstTime()-process.alreadyRunTime(time):
+                temp = process.startRunning(time)
                 #if time <= 1000:
-                print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
-                process.startRunning(time)
+                print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), temp, print_ready_queue(ready_queue) ))
                 process.startContextSwitchOut(time)
                 event_queue.put((time + cst, 1, process_name, "EnterQueue"))
                 #if time <= 1000:
