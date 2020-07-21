@@ -401,7 +401,7 @@ def SRT(processes,cst):
                 candidate.startContextSwitchIn(time)
                 current_running = candidate
             else:
-                print(candidate.getEstimatedBurstTime(),candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime(),current_running.alreadyRunTime(time))
+                # print(candidate.getEstimatedBurstTime(),candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime(),current_running.alreadyRunTime(time))
                 if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time):
                     # print("Evil begins here", candidate.getEstimatedRemaining() , current_running.getEstimatedRemaining())
                     # if current running is running, just preempt
@@ -595,9 +595,9 @@ processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 
-SJF(processes2, t_cs/2)
+#SJF(processes2, t_cs/2)
 SRT(processes3,t_cs/2)
-RR(processes4,t_cs/2,t_slice,rradd)
+#RR(processes4,t_cs/2,t_slice,rradd)
 # FCSF
 FCFS_burst = 0
 FCFS_total_burst = 0
