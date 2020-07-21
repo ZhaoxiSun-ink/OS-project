@@ -69,7 +69,6 @@ class Process():
     def getEstimatedBurstTime(self):
         return int(self.estimated_burst_time)
 
-
     def print(self):
         print("Process {} has {} CPU bursts, and arrvies at {}.".format(self.name, self.total_bursts, self.arrival_time))
         for i in range(self.total_bursts-1):
@@ -117,6 +116,8 @@ class Process():
         self.status = "Context_Switch_Out"
         self.cpu_end_timestamp = time
         self.remaining_burst_times[self.index] -= self.cpu_end_timestamp - self.cpu_start_timestamp
+        # Update estimated remaining time
+        self.estimated_remaining_burst_time = self.estimated_burst_time - (self.burst_times[self.index] - self.remaining_burst_times[self.index])
 
     # Process leaves running state.
     # Requires: Process must be at "Context_Switch_Out" status

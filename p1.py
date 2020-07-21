@@ -257,8 +257,9 @@ def SRT(processes,cst):
         process.estimated_burst_time = tau_i
 
     #initalize all process
-    for p in processes:
-        p.estimated_burst_time = 1/parameter
+    for process in processes:
+        process.estimated_burst_time = 1/parameter
+        process.estimated_remaining_burst_time = process.estimated_burst_time - (process.burst_times[process.index] - process.remaining_burst_times[process.index])
 
     #waiting_queue, sorted by arrival time
     process_table = dict()
@@ -423,9 +424,12 @@ def SRT(processes,cst):
                     candidate.startContextSwitchIn(time)
                     current_running = candidate
                 else:
-                    print(candidate.name, current_running.name)
-                    print(print_ready_queue(ready_queue))
-                    print(candidate.getEstimatedBurstTime(),candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime(),current_running.alreadyRunTime(time))
+                    #print(candidate.name, current_running.name)
+                    #print(print_ready_queue(ready_queue))
+                    #procj = process_table["J"]
+                    #procb = process_table['B']
+                    #print(procj.estimated_remaining_burst_time, procb.estimated_remaining_burst_time)
+                    #print(candidate.getEstimatedBurstTime(),candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime(),current_running.alreadyRunTime(time))
                     if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time):
                         #print("Entered if")
                         #print(candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time))
