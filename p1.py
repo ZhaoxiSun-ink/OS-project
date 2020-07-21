@@ -297,7 +297,7 @@ def SRT(processes,cst):
                 process.startContextSwitchIn(time)
                 current_running = process
             else:
-                if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < process.getEstimatedBurstTime()-process.alreadyRunTime(time):
+                if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time):
                     # if current running is running, just preempt
                     if current_running.getStatus() == "Running":
                         current_running.startContextSwitchOut(time)
@@ -393,14 +393,15 @@ def SRT(processes,cst):
             candidate = ready_queue[0]
             # print("Candidate is ", candidate.name)
             # Nothing running now, just start
+            #print(current_running)
             if current_running == None:
                 ready_queue.pop(0)
                 event_queue.put((time + cst, 2, candidate.getName(), "Run"))
                 candidate.startContextSwitchIn(time)
-                current_running = new_process
+                current_running = candidate
             else:
-                # print(candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) , process.getEstimatedBurstTime()-process.alreadyRunTime(time))
-                if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < process.getEstimatedBurstTime()-process.alreadyRunTime(time):
+                print(candidate.getEstimatedBurstTime(),candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime(),current_running.alreadyRunTime(time))
+                if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time):
                     # print("Evil begins here", candidate.getEstimatedRemaining() , current_running.getEstimatedRemaining())
                     # if current running is running, just preempt
                     if current_running.getStatus() == "Running":
@@ -587,13 +588,13 @@ if __name__ == '__main__':
         process = Process(pid,arr,burst,io)
         processes.append(process)
 processes1 = deepcopy(processes)
-FCFS(processes1, t_cs/2)
+#FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 
-SJF(processes2, t_cs/2)
-#SRT(processes3,t_cs/2)
+#SJF(processes2, t_cs/2)
+SRT(processes3,t_cs/2)
 # FCSF
 FCFS_burst = 0
 FCFS_total_burst = 0
