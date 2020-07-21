@@ -18,6 +18,7 @@ class Process():
         self.status = None
         # i-th CPU burst we are now in
         self.index = 0
+        self.preempt_num = 0
         # tmp Variables
         self.cpu_start_timestamp = -1
         self.cpu_end_timestamp = -1
@@ -123,6 +124,7 @@ class Process():
     def preempt(self, time):
         assert self.status == "Context_Switch_Out"
         self.status = "Ready"
+        self.preempt_num += 1
         self.waiting_times.append((time, -1))
 
     # Process finishes CPU burst.
