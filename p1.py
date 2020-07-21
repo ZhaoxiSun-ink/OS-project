@@ -44,7 +44,10 @@ def FCFS(processes, cst):
         name = process.getName()
         event_queue.put((arrival_time, 4, name, "Arrive"))
         process_table[name] = process
-        print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
+        if process.getTotalBursts() == 1:
+            print("Process {} [NEW] (arrival time {} ms) {} CPU burst".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
+        else:
+            print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process.getName(), process.getArrivalTime(), process.getTotalBursts()))
     print("time 0ms: Simulator started for FCFS [Q <empty>]")
     while(len(process_table) > 0):
         next_event = event_queue.get(block=False)
