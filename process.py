@@ -153,6 +153,8 @@ class Process():
         self.status = "Ready"
         self.waiting_times.append((time, -1))
         self.index += 1
+        # Update estimated remaining time
+        self.estimated_remaining_burst_time = self.estimated_burst_time - (self.burst_times[self.index] - self.remaining_burst_times[self.index])
 
     def getEstimatedRemaining(self):
         return self.remaining_burst_times[self.index]

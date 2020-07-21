@@ -279,7 +279,7 @@ def SRT(processes,cst):
     print("time 0ms: Simulator started for SRT [Q <empty>]")
 
     while(len(process_table) > 0):
-        if time > 500: break
+        if time > 2000: break
         # print("Length: ", event_queue.qsize(), " Time of prev: ", time)
         next_event = event_queue.get(block=False)
         time = int(next_event[0])
@@ -411,6 +411,7 @@ def SRT(processes,cst):
             # print(time, process.getStatus())
             if process.getStatus() == "IO":
                 process.finishIO(time)
+                ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
                 #if time <= 1000:
                 # Fastest process in the queue
                 candidate = ready_queue[0]
