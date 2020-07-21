@@ -291,6 +291,8 @@ def SRT(processes,cst):
                 current_running = process
         #run
         elif event_type == "Run":
+            print(time)
+            print(process.getStatus())
             expected = process.startRunning(time)
             event_queue.put((time + expected, (process_name, "CSOut")))
             CPU_vacant_at = time + expected + cst
@@ -356,9 +358,6 @@ def SRT(processes,cst):
                 preemption_process = current_running
                 current_running = process
                 event_queue.put((time+cst,(preemption_process.getName(),"EnterQueue")))
-                preemption_process.startContextSwitchOut()
-                preemption_process.preempt()
-
         else:
             print("ERROR: <error-text-here>")
             return
