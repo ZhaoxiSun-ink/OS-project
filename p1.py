@@ -173,8 +173,8 @@ def SJF(processes, cst):
             # Sort the ready state by estimated_burst_time
             ready_state.append(process)
             ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
-            #if time <= 1000:
-            print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
+            if time <= 1000:
+                print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) != 0 and (current_running == None or time >= CPU_vacant_at):
                 ready_state.pop(0)
                 event_queue.put((time + cst, 2, process_name, "Run"))
@@ -184,25 +184,25 @@ def SJF(processes, cst):
             expected = process.startRunning(time)
             event_queue.put((time + expected, 0, process_name, "CSOut"))
             CPU_vacant_at = time + expected + cst
-            #if time <= 1000:
-            print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready(ready_state) ))
+            if time <= 1000:
+                print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready(ready_state) ))
         elif order_num == 0:
             process.startContextSwitchOut(time)
             event_queue.put((time + cst, 1, process_name, "EnterIO"))
             remaining_bursts = process.total_bursts-process.index-1
-            if remaining_bursts > 1:
+            if remaining_bursts > 1 and time <= 1000:
                 print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready(ready_state) ))
-            elif remaining_bursts == 1:
+            elif remaining_bursts == 1 and time <= 1000:
                 print("time {}ms: Process {} (tau {}ms) completed a CPU burst; 1 burst to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
-            elif remaining_bursts == 0:
+            elif remaining_bursts == 0 and time:
                 print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, print_ready(ready_state) ))
-            if remaining_bursts != 0:
+            if remaining_bursts != 0 and time <= 1000:
                 # recaculate_tau:
                 recaculate_tau(process, process.index)
                 print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready(ready_state) ))
                 # Sort the ready state by estimated_burst_time
                 ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
-            if process.index < process.total_bursts - 1:
+            if process.index < process.total_bursts - 1 and time <= 1000:
                 print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready(ready_state) ))
             context_switch_count += 1
             process.context_switch += 1
@@ -218,7 +218,6 @@ def SJF(processes, cst):
                 new_process = ready_state.pop(0)
                 new_name = new_process.name
                 new_process = process_table[new_name]
-                #print("Name: {} | Status: {} | Time: {}".format( new_process.name, new_process.getStatus(), time) )
                 event_queue.put((time + cst, 2, new_name, "Run"))
                 ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
                 new_process.startContextSwitchIn(time) #problem here
@@ -228,8 +227,8 @@ def SJF(processes, cst):
             ready_state.append(process)
             # Sort the ready state by estimated_burst_time
             ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
-            #if time <= 1000:
-            print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
+            if time <= 1000:
+                print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_state.pop(0)
                 event_queue.put((time + cst, 2, process_name, "Run"))
@@ -401,7 +400,7 @@ def SRT(processes,cst):
             if process.getStatus() == "Context_Switch_Out":
                 process.preempt(time)
                 current_running = None
-            
+
             # Fastest process in the queue
             candidate = ready_queue[0]
             # print("Candidate is ", candidate.name)
@@ -495,8 +494,8 @@ def RR(processes, cst, t_slice, rradd):
                 event_queue.put((time + actual, 0, (process_name, "CSOut", 0)))
             CPU_vacant_at = time + actual + cst
             if time <= 1000:#time < 39000 and time > 37000:
-                print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))				
-        elif event_type == "CSOut":				
+                print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]".format(time, process_name, expected, printwq(waiting_queue)))
+        elif event_type == "CSOut":
             process.startContextSwitchOut(time)
             # if preemption occurs
             if next_event[2][2] == 1:
@@ -551,7 +550,7 @@ def RR(processes, cst, t_slice, rradd):
             print("ERROR: <error-text-here>")
             return
     print("time {}ms: Simulator ended for RR [Q <empty>]".format(time))
-    
+
 
 #main part
 if __name__ == '__main__':
@@ -604,19 +603,17 @@ if __name__ == '__main__':
         process = Process(pid,arr,burst,io)
         processes.append(process)
 processes1 = deepcopy(processes)
-#FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
-
-#SJF(processes2, t_cs/2)
+FCFS(processes1, t_cs/2)
+SJF(processes2, t_cs/2)
 SRT(processes3,t_cs/2)
-#RR(processes4,t_cs/2,t_slice,rradd)
-# FCSF
+RR(processes4,t_cs/2,t_slice,rradd)
 FCFS_burst = 0
 FCFS_total_burst = 0
 FCFS_waiting = 0
-FCFS_waiting_num = 0 
+FCFS_waiting_num = 0
 FCFS_around = 0
 FCFS_around_num = 0
 FCFS_total_context_switch = 0
@@ -624,7 +621,7 @@ FCFS_total_context_switch = 0
 SJF_burst = 0
 SJF_total_burst = 0
 SJF_waiting = 0
-SJF_waiting_num = 0 
+SJF_waiting_num = 0
 SJF_around = 0
 SJF_around_num = 0
 SJF_total_context_switch = 0
@@ -632,7 +629,7 @@ SJF_total_context_switch = 0
 SRT_burst = 0
 SRT_total_burst = 0
 SRT_waiting = 0
-SRT_waiting_num = 0 
+SRT_waiting_num = 0
 SRT_around = 0
 SRT_around_num = 0
 SRT_total_context_switch = 0
@@ -641,36 +638,36 @@ SRT_total_preemption = 0
 RR_burst = 0
 RR_total_burst = 0
 RR_waiting = 0
-RR_waiting_num = 0 
+RR_waiting_num = 0
 RR_around = 0
 RR_around_num = 0
 RR_total_context_switch = 0
-RR_total_preemption = 0 
+RR_total_preemption = 0
 # For each process, sum the total
 for i in range(len(processes)):
     # FCSF
     FCFS_burst += processes1[i].getTotalBurstTime()
     FCFS_total_burst += processes1[i].getTotalBursts()
     FCFS_waiting += processes1[i].getTotalWaitingTime()
-    FCFS_waiting_num += processes1[i].getWaitingTimeNum() 
-    FCFS_around += processes1[i].getTotalTurnaroundTime() 
+    FCFS_waiting_num += processes1[i].getWaitingTimeNum()
+    FCFS_around += processes1[i].getTotalTurnaroundTime()
     FCFS_around_num += processes1[i].getTurnAroundTimeNum()
     FCFS_total_context_switch += processes1[i].context_switch
     # SJF
     SJF_burst += processes2[i].getTotalBurstTime()
     SJF_total_burst += processes2[i].getTotalBursts()
     SJF_waiting += processes2[i].getTotalWaitingTime()
-    SJF_waiting_num += processes2[i].getWaitingTimeNum() 
-    SJF_around += processes2[i].getTotalTurnaroundTime() 
+    SJF_waiting_num += processes2[i].getWaitingTimeNum()
+    SJF_around += processes2[i].getTotalTurnaroundTime()
     SJF_around_num += processes2[i].getTurnAroundTimeNum()
     SJF_total_context_switch += processes2[i].context_switch
-    
+
     # SRT
     SRT_burst += processes3[i].getTotalBurstTime()
     SRT_total_burst += processes3[i].getTotalBursts()
     SRT_waiting += processes3[i].getTotalWaitingTime()
-    SRT_waiting_num += processes3[i].getWaitingTimeNum() 
-    SRT_around += processes3[i].getTotalTurnaroundTime() 
+    SRT_waiting_num += processes3[i].getWaitingTimeNum()
+    SRT_around += processes3[i].getTotalTurnaroundTime()
     SRT_around_num += processes3[i].getTurnAroundTimeNum()
     SRT_total_context_switch += processes3[i].context_switch
     SRT_total_preemption += processes3[i].preempt_num
@@ -678,12 +675,12 @@ for i in range(len(processes)):
     RR_burst += processes4[i].getTotalBurstTime()
     RR_total_burst += processes4[i].getTotalBursts()
     RR_waiting += processes4[i].getTotalWaitingTime()
-    RR_waiting_num += processes4[i].getWaitingTimeNum() 
-    RR_around += processes4[i].getTotalTurnaroundTime() 
+    RR_waiting_num += processes4[i].getWaitingTimeNum()
+    RR_around += processes4[i].getTotalTurnaroundTime()
     RR_around_num += processes4[i].getTurnAroundTimeNum()
     RR_total_context_switch += processes4[i].context_switch
     RR_total_preemption += processes3[i].preempt_num
-    
+
 # divide by total process number
 FCSF_avg_burst_time  = FCFS_burst / FCFS_total_burst
 FCSF_avg_waiting_time  = FCFS_waiting / FCFS_waiting_num
@@ -721,7 +718,7 @@ with open('simout.txt', 'w') as f:
     print("-- total number of context switches: {}".format(SJF_total_context_switch) )
     print("-- total number of preemptions: 0")
     #
-    
+
     print("Algorithm SRT")
     print("-- average CPU burst time: {:.3f} ms".format(SRT_avg_burst_time) )
     print("-- average wait time: {:.3f} ms".format(SRT_avg_waiting_time) )
@@ -735,5 +732,5 @@ with open('simout.txt', 'w') as f:
     print("-- average turnaround time: {:.3f} ms".format(RR_avg_turn_around_time) )
     print("-- total number of context switches: {}".format(RR_total_context_switch) )
     print("-- total number of preemptions: {}".format(RR_total_preemption) )
-    
+
     sys.stdout = original_stdout # Reset the standard output to its original value
