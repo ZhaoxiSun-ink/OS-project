@@ -278,6 +278,7 @@ def SRT(processes,cst):
     print("time 0ms: Simulator started for SRT [Q <empty>]")
 
     while(len(process_table) > 0):
+        if time > 500: break
         # print("Length: ", event_queue.qsize(), " Time of prev: ", time)
         next_event = event_queue.get(block=False)
         time = int(next_event[0])
@@ -332,6 +333,7 @@ def SRT(processes,cst):
             if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < process.getEstimatedBurstTime()-process.alreadyRunTime(time):
                 temp = process.startRunning(time)
                 #if time <= 1000:
+                # TODO
                 print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), temp, print_ready_queue(ready_queue) ))
                 process.startContextSwitchOut(time)
                 event_queue.put((time + cst, 1, process_name, "EnterQueue"))
@@ -421,8 +423,12 @@ def SRT(processes,cst):
                     candidate.startContextSwitchIn(time)
                     current_running = candidate
                 else:
-                    # print(candidate.getEstimatedBurstTime(),candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime(),current_running.alreadyRunTime(time))
+                    print(candidate.name, current_running.name)
+                    print(print_ready_queue(ready_queue))
+                    print(candidate.getEstimatedBurstTime(),candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime(),current_running.alreadyRunTime(time))
                     if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time):
+                        #print("Entered if")
+                        #print(candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time))
                         # if current running is running, just preempt
                         if current_running.getStatus() == "Running":
                             print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]"
