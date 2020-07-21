@@ -14,6 +14,7 @@ class Process():
         self.waiting_times = [] # [(start_time, end_time), (start_time, end_time), ...]
         # Status can be: "IO", "Ready", "Running", "Context_Swtich_In" and "Context_Switch_Out"
         self.context_switch = 0
+        self.preempt_num = 0
         self.status = None
         # i-th CPU burst we are now in
         self.index = 0

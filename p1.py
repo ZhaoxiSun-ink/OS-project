@@ -204,6 +204,7 @@ def SJF(processes, cst):
             if process.index < process.total_bursts - 1:
                 print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready(ready_state) ))
             context_switch_count += 1
+            process.context_switch += 1
         elif order_num == 1:
             expected = process.finishRunning(time)
             if expected == -1:
@@ -521,30 +522,109 @@ if __name__ == '__main__':
 		process = Process(pid,arr,burst,io)
 		processes.append(process)
 processes1 = deepcopy(processes)
-#FCFS(processes1, t_cs/2)
+FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
-print("Simout:")
+
+SJF(processes2, t_cs/2)
+#SRT(processes3,t_cs/2)
+# FCSF
 FCSF_avg_burst_time = 0
 FCSF_avg_waiting_time = 0
 FCSF_avg_turn_around_time = 0
 FCSF_total_context_switch = 0
-"""
+FCSF_total_preemption = 0
+# SJF
+SJF_avg_burst_time = 0
+SJF_avg_waiting_time = 0
+SJF_avg_turn_around_time = 0
+SJF_total_context_switch = 0
+SJF_total_preemption = 0
+# SRT
+SRT_avg_burst_time = 0
+SRT_avg_waiting_time = 0
+SRT_avg_turn_around_time = 0
+SRT_total_context_switch = 0
+SRT_total_preemption = 0
+# RR
+RR_avg_burst_time = 0
+RR_avg_waiting_time = 0
+RR_avg_turn_around_time = 0
+RR_total_context_switch = 0
+RR_total_preemption = 0
+# For each process, sum the total
 for i in range(len(processes)):
     # FCSF
     FCSF_avg_burst_time += ( processes1[i].getTotalBurstTime() / processes1[i].getTotalBursts() )
     FCSF_avg_waiting_time += ( processes1[i].getTotalWaitingTime() / processes1[i].getWaitingTimeNum() )
     FCSF_avg_turn_around_time += ( processes1[i].getTotalTurnaroundTime() / processes1[i].getTurnAroundTimeNum() )
     FCSF_total_context_switch += processes1[i].context_switch
-"""
-print()
+    # SJF
+    SJF_avg_burst_time += ( processes2[i].getTotalBurstTime() / processes2[i].getTotalBursts() )
+    SJF_avg_waiting_time += ( processes2[i].getTotalWaitingTime() / processes2[i].getWaitingTimeNum() )
+    SJF_avg_turn_around_time += ( processes2[i].getTotalTurnaroundTime() / processes2[i].getTurnAroundTimeNum() )
+    SJF_total_context_switch += processes2[i].context_switch
+    """
+    # SRT
+    SRT_avg_burst_time += ( processes3[i].getTotalBurstTime() / processes3[i].getTotalBursts() )
+    SRT_avg_waiting_time += ( processes3[i].getTotalWaitingTime() / processes3[i].getWaitingTimeNum() )
+    SRT_avg_turn_around_time += ( processes3[i].getTotalTurnaroundTime() / processes3[i].getTurnAroundTimeNum() )
+    SRT_total_context_switch += processes3[i].context_switch
+    SRT_total_preemption += processes3[i].preempt_num
+    # RR
+    RR_avg_burst_time += ( processes4[i].getTotalBurstTime() / processes4[i].getTotalBursts() )
+    RR_avg_waiting_time += ( processes4[i].getTotalWaitingTime() / processes4[i].getWaitingTimeNum() )
+    RR_avg_turn_around_time += ( processes4[i].getTotalTurnaroundTime() / processes4[i].getTurnAroundTimeNum() )
+    RR_total_context_switch += processes4[i].context_switch
+    RR_total_preemption += processes4[i].preempt_num
+    """
+# divide by total process number
 FCSF_avg_burst_time /= len(processes)
 FCSF_avg_waiting_time /= len(processes)
 FCSF_avg_turn_around_time /= len(processes)
-print(FCSF_avg_burst_time)
-print(FCSF_avg_waiting_time)
-print(FCSF_avg_turn_around_time)
-print(FCSF_total_context_switch)
-SJF(processes2, t_cs/2)
-#SRT(processes3,t_cs/2)
+
+SJF_avg_burst_time /= len(processes)
+SJF_avg_waiting_time /= len(processes)
+SJF_avg_turn_around_time /= len(processes)
+
+SJF_avg_burst_time /= len(processes)
+SJF_avg_waiting_time /= len(processes)
+SJF_avg_turn_around_time /= len(processes)
+
+SJF_avg_burst_time /= len(processes)
+SJF_avg_waiting_time /= len(processes)
+SJF_avg_turn_around_time /= len(processes)
+
+original_stdout = sys.stdout # Save a reference to the original standard output
+with open('simout.txt', 'w') as f:
+    sys.stdout = f # Change the standard output to the file we created.
+    #
+    print("Algorithm FCFS")
+    print("-- average CPU burst time: {:.3f} ms".format(FCSF_avg_burst_time) )
+    print("-- average wait time: {:.3f} ms".format(FCSF_avg_waiting_time) )
+    print("-- average turnaround time: {:.3f} ms".format(FCSF_avg_turn_around_time) )
+    print("-- total number of context switches: {}".format(FCSF_total_context_switch) )
+    print("-- total number of preemptions: {}".format(FCSF_total_preemption) )
+    #
+    print("Algorithm SJF")
+    print("-- average CPU burst time: {:.3f} ms".format(SJF_avg_burst_time) )
+    print("-- average wait time: {:.3f} ms".format(SJF_avg_waiting_time) )
+    print("-- average turnaround time: {:.3f} ms".format(FCSF_avg_turn_around_time) )
+    print("-- total number of context switches: {}".format(SJF_total_context_switch) )
+    print("-- total number of preemptions: {}".format(SJF_total_preemption) )
+    #
+    print("Algorithm SRT")
+    print("-- average CPU burst time: {:.3f} ms".format(SRT_avg_burst_time) )
+    print("-- average wait time: {:.3f} ms".format(SRT_avg_waiting_time) )
+    print("-- average turnaround time: {:.3f} ms".format(SRT_avg_turn_around_time) )
+    print("-- total number of context switches: {}".format(SRT_total_context_switch) )
+    print("-- total number of preemptions: {}".format(SRT_total_preemption) )
+    #
+    print("Algorithm RR")
+    print("-- average CPU burst time: {:.3f} ms".format(RR_avg_burst_time) )
+    print("-- average wait time: {:.3f} ms".format(RR_avg_waiting_time) )
+    print("-- average turnaround time: {:.3f} ms".format(RR_avg_turn_around_time) )
+    print("-- total number of context switches: {}".format(RR_total_context_switch) )
+    print("-- total number of preemptions: {}".format(RR_total_preemption) )
+    sys.stdout = original_stdout # Reset the standard output to its original value
