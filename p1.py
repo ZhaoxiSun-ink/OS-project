@@ -506,7 +506,7 @@ def RR(processes, cst, t_slice, rradd):
             if next_event[2][2] == 1:
                 event_queue.put((time + cst, 1, (process_name, "EnterIO", 1)))
                 if time <= 1000:#time < 39000 and time > 37000:
-                    print("time {}ms: Time slice expired; process {} preempted with {} to go [Q {}]".format(time, process_name, process.remaining_burst_times[process.index], printwq(waiting_queue)))
+                    print("time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]".format(time, process_name, process.remaining_burst_times[process.index], printwq(waiting_queue)))
             else:
                 event_queue.put((time + cst, 1, (process_name, "EnterIO", 0)))
                 remaining_bursts = process.total_bursts-process.index-1
