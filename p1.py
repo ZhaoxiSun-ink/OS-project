@@ -594,71 +594,85 @@ processes4 = deepcopy(processes)
 SJF(processes2, t_cs/2)
 #SRT(processes3,t_cs/2)
 # FCSF
-FCSF_avg_burst_time = 0
-FCSF_avg_waiting_time = 0
-FCSF_avg_turn_around_time = 0
-FCSF_total_context_switch = 0
-FCSF_total_preemption = 0
+FCSF_burst = 0
+FCFS_total_burst = 0
+FCSF_waiting = 0
+FCFS_waiting_num = 0 
+FCSF_around = 0
+FCSF_around_num = 0
 # SJF
-SJF_avg_burst_time = 0
-SJF_avg_waiting_time = 0
-SJF_avg_turn_around_time = 0
-SJF_total_context_switch = 0
-SJF_total_preemption = 0
+SJF_burst = 0
+SJF_total_burst = 0
+SJF_waiting = 0
+SJF_waiting_num = 0 
+SJF_around = 0
+SJF_around_num = 0
 # SRT
-SRT_avg_burst_time = 0
-SRT_avg_waiting_time = 0
-SRT_avg_turn_around_time = 0
-SRT_total_context_switch = 0
-SRT_total_preemption = 0
+SRT_burst = 0
+SRT_total_burst = 0
+SRT_waiting = 0
+SRT_waiting_num = 0 
+SRT_around = 0
+SRT_around_num = 0
 # RR
-RR_avg_burst_time = 0
-RR_avg_waiting_time = 0
-RR_avg_turn_around_time = 0
-RR_total_context_switch = 0
-RR_total_preemption = 0
+RR_burst = 0
+RR_total_burst = 0
+RR_waiting = 0
+RR_waiting_num = 0 
+RR_around = 0
+RR_around_num = 0
 # For each process, sum the total
 for i in range(len(processes)):
     # FCSF
-    FCSF_avg_burst_time += ( processes1[i].getTotalBurstTime() / processes1[i].getTotalBursts() )
-    FCSF_avg_waiting_time += ( processes1[i].getTotalWaitingTime() / processes1[i].getWaitingTimeNum() )
-    FCSF_avg_turn_around_time += ( processes1[i].getTotalTurnaroundTime() / processes1[i].getTurnAroundTimeNum() )
+    FCSF_burst += processes1[i].getTotalBurstTime()
+    FCFS_total_burst += processes1[i].getTotalBursts()
+    FCSF_waiting += processes1[i].getTotalWaitingTime()
+    FCFS_waiting_num += processes1[i].getWaitingTimeNum() 
+    FCSF_around += processes1[i].getTotalTurnaroundTime() 
+    FCSF_around_num += processes1[i].getTurnAroundTimeNum()
     FCSF_total_context_switch += processes1[i].context_switch
     # SJF
-    SJF_avg_burst_time += ( processes2[i].getTotalBurstTime() / processes2[i].getTotalBursts() )
-    SJF_avg_waiting_time += ( processes2[i].getTotalWaitingTime() / processes2[i].getWaitingTimeNum() )
-    SJF_avg_turn_around_time += ( processes2[i].getTotalTurnaroundTime() / processes2[i].getTurnAroundTimeNum() )
+    SJF_burst += processes2[i].getTotalBurstTime()
+    SJF_total_burst += processes2[i].getTotalBursts()
+    SJF_waiting += processes2[i].getTotalWaitingTime()
+    SJF_waiting_num += processes2[i].getWaitingTimeNum() 
+    SJF_around += processes2[i].getTotalTurnaroundTime() 
+    SJF_around_num += processes2[i].getTurnAroundTimeNum()
     SJF_total_context_switch += processes2[i].context_switch
     """
     # SRT
-    SRT_avg_burst_time += ( processes3[i].getTotalBurstTime() / processes3[i].getTotalBursts() )
-    SRT_avg_waiting_time += ( processes3[i].getTotalWaitingTime() / processes3[i].getWaitingTimeNum() )
-    SRT_avg_turn_around_time += ( processes3[i].getTotalTurnaroundTime() / processes3[i].getTurnAroundTimeNum() )
+    SRT_burst += processes3[i].getTotalBurstTime()
+    SRT_total_burst += processes3[i].getTotalBursts()
+    SRT_waiting += processes3[i].getTotalWaitingTime()
+    SRT_waiting_num += processes3[i].getWaitingTimeNum() 
+    SRT_around += processes3[i].getTotalTurnaroundTime() 
+    SRT_around_num += processes3[i].getTurnAroundTimeNum()
     SRT_total_context_switch += processes3[i].context_switch
-    SRT_total_preemption += processes3[i].preempt_num
     # RR
-    RR_avg_burst_time += ( processes4[i].getTotalBurstTime() / processes4[i].getTotalBursts() )
-    RR_avg_waiting_time += ( processes4[i].getTotalWaitingTime() / processes4[i].getWaitingTimeNum() )
-    RR_avg_turn_around_time += ( processes4[i].getTotalTurnaroundTime() / processes4[i].getTurnAroundTimeNum() )
+    RR_burst += processes4[i].getTotalBurstTime()
+    RR_total_burst += processes4[i].getTotalBursts()
+    RR_waiting += processes4[i].getTotalWaitingTime()
+    RR_waiting_num += processes4[i].getWaitingTimeNum() 
+    RR_around += processes4[i].getTotalTurnaroundTime() 
+    RR_around_num += processes4[i].getTurnAroundTimeNum()
     RR_total_context_switch += processes4[i].context_switch
-    RR_total_preemption += processes4[i].preempt_num
     """
 # divide by total process number
-FCSF_avg_burst_time /= len(processes)
-FCSF_avg_waiting_time /= len(processes)
-FCSF_avg_turn_around_time /= len(processes)
+FCSF_avg_burst_time  = FCSF_avg / FCFS_total_burst
+FCSF_avg_waiting_time  = FCSF_waiting / FCFS_waiting_num
+FCSF_avg_turn_around_time  = FCSF_around / FCSF_around_num
 
-SJF_avg_burst_time /= len(processes)
-SJF_avg_waiting_time /= len(processes)
-SJF_avg_turn_around_time /= len(processes)
+SJF_avg_burst_time  = SJF_avg / SJF_total_burst
+SJF_avg_waiting_time  = SJF_waiting / SJF_waiting_num
+SJF_avg_turn_around_time  = SJF_around / SJF_around_num
 
-SJF_avg_burst_time /= len(processes)
-SJF_avg_waiting_time /= len(processes)
-SJF_avg_turn_around_time /= len(processes)
+SRT_avg_burst_time  = SRT_avg / SRT_total_burst
+SRT_avg_waiting_time  = SRT_waiting / SRT_waiting_num
+SRT_avg_turn_around_time  = SRT_around / SRT_around_num
 
-SJF_avg_burst_time /= len(processes)
-SJF_avg_waiting_time /= len(processes)
-SJF_avg_turn_around_time /= len(processes)
+RR_avg_burst_time  = RR_avg / RR_total_burst
+RR_avg_waiting_time  = RR_waiting / RR_waiting_num
+RR_avg_turn_around_time  = RR_around / RR_around_num
 
 original_stdout = sys.stdout # Save a reference to the original standard output
 with open('simout.txt', 'w') as f:
