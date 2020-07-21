@@ -153,6 +153,9 @@ class Process():
 
     def getEstimatedRemaining(self):
         return self.remaining_burst_times[self.index]
+    
+    def alreadyRunTime(self, time):
+        return self.burst_times[self.index] - self.remaining_burst_times[self.index] - (time - self.cpu_start_timestamp)
 
 if __name__ == "__main__":
     n = "Process"
