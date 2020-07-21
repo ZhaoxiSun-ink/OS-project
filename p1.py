@@ -81,6 +81,7 @@ def FCFS(processes, cst):
 			if process.index < process.total_bursts - 1 and time <= 1000:
 				print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), printwq(waiting_queue)))
 			context_switch_count += 1
+            process.context_switch += 1
 		elif event_type == "EnterIO":
 			expected = process.finishRunning(time)
 			if expected == -1:
@@ -264,6 +265,7 @@ def SRT(processes,cst):
     time = 0
     current_running = None
     context_switch_count = 0
+    ignore_list = []
     #put all processes into event_queue
     for process in processes:
         arrival_time = process.getArrivalTime()
@@ -274,7 +276,7 @@ def SRT(processes,cst):
     print("time 0ms: Simulator started for SRT [Q <empty>]")
 
     while(len(process_table) > 0):
-        print(process_table["B"].status)
+        print("Length: ", event_queue.qsize())
         next_event = event_queue.get(block=False)
         time = int(next_event[0])
         process_name = next_event[2]
@@ -332,9 +334,9 @@ def SRT(processes,cst):
             if process in ignore_list:
                 ignore_list.pop(ignore_list.index(process))
                 continue
-            print(process.name, process.status)
+            # print(process.name, process.status)
             process.startContextSwitchOut(time)
-            print("Remainning", process.remaining_burst_times[process.index])
+            # print("Remainning", process.remaining_burst_times[process.index])
             if process.remaining_burst_times[process.index] == 0:
                 event_queue.put((time + cst, 1, process_name, "EnterIO"))
             else:
@@ -586,13 +588,13 @@ if __name__ == '__main__':
         process = Process(pid,arr,burst,io)
         processes.append(process)
 processes1 = deepcopy(processes)
-FCFS(processes1, t_cs/2)
+# FCFS(processes1, t_cs/2)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
 
-SJF(processes2, t_cs/2)
-#SRT(processes3,t_cs/2)
+# SJF(processes2, t_cs/2)
+SRT(processes3,t_cs/2)
 # FCSF
 FCSF_avg_burst_time = 0
 FCSF_avg_waiting_time = 0
