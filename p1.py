@@ -108,6 +108,7 @@ def FCFS(processes, cst):
 		else:
 			print("ERROR: <error-text-here>")
 			return
+
 	print("time {}ms: Simulator ended for FCFS [Q <empty>]".format(time))
 
 
@@ -154,7 +155,10 @@ def SJF(processes, cst):
         name = process.getName()
         event_queue.put((arrival_time, 4, name, "Arrive"))
         process_table[name] = process
-        print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), process.getEstimatedBurstTime() ))
+        if process.getTotalBursts() == 1:
+            print("Process {} [NEW] (arrival time {} ms) {} CPU burst (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), process.getEstimatedBurstTime() ))
+        else:
+            print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), process.getEstimatedBurstTime() ))
     print("time 0ms: Simulator started for SJF [Q <empty>]")
     while( len(process_table) > 0 ):
         next_event = event_queue.get()
@@ -191,7 +195,6 @@ def SJF(processes, cst):
                 print("time {}ms: Process {} (tau {}ms) completed a CPU burst; 1 burst to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             elif remaining_bursts == 0:
                 print("time {}ms: Process {} terminated [Q {}]".format(time, process_name, print_ready(ready_state) ))
-
             if remaining_bursts != 0:
                 # recaculate_tau:
                 recaculate_tau(process, process.index)
@@ -210,9 +213,12 @@ def SJF(processes, cst):
             current_running = None
             # Start running another immediately, if there is another one on the waiting queue
             if len(ready_state) > 0:
-                new_name = ready_state.pop(0).name
+                new_process = ready_state.pop(0)
+                new_name = new_process.name
                 new_process = process_table[new_name]
+                #print("Name: {} | Status: {} | Time: {}".format( new_process.name, new_process.getStatus(), time) )
                 event_queue.put((time + cst, 2, new_name, "Run"))
+                ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
                 new_process.startContextSwitchIn(time) #problem here
                 current_running = new_name
         elif order_num == 3:
@@ -250,7 +256,6 @@ def SRT(processes,cst):
 
     #waiting_queue, sorted by arrival time
     process_table = dict()
-    ignore_list= []
     ready_queue = []
     event_queue = PriorityQueue()
     time = 0
@@ -289,13 +294,9 @@ def SRT(processes,cst):
             expected = process.startRunning(time)
             event_queue.put((time + expected, (process_name, "CSOut")))
             CPU_vacant_at = time + expected + cst
-            print(time+expected)
             print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
 
         elif event_type == "CSOut":
-            if next_event in ignore_list:
-                ignore_list.pop(0)
-                continue
             process.startContextSwitchOut(time)
             if process.total_bursts-process.index-1 == 0:
                 event_queue.put((time,(process_name, "EnterIO")))
@@ -340,30 +341,23 @@ def SRT(processes,cst):
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
             print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]".format(time, process_name, print_ready_queue(ready_queue) ))
             if current_running != None:
-                print(current_running.getStatus())
-                print(current_running.getEstimatedRemaining(time))
-                print(current_running.getEstimatedRemaining(time) > process.getEstimatedRemaining(time))
-            print(process.getEstimatedRemaining(time))
+                print(current_running.getEstimatedRemaining())
+            print(process.getEstimatedRemaining())
             if len(ready_queue) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_queue.pop(0)
                 event_queue.put((time + cst, (process_name, "Run")))
                 process.startContextSwitchIn(time)
                 current_running = process
-            if current_running != None and (current_running.getStatus() == "Running" or current_running.getStatus() == "Context_Switch_In") and current_running.getEstimatedRemaining(time) > process.getEstimatedRemaining(time):
+            if len(ready_queue) == 1 and current_running != None and current_running.getEstimatedRemaining() > process.getEstimatedRemaining():
                 print("preemption")
                 ready_queue.pop(0)
-                event_queue.put((time + 2*cst, (process_name, "Run")))
-                process.startContextSwitchIn(time+cst)
+                event_queue.put((time + cst, (process_name, "Run")))
+                process.startContextSwitchIn(time)
                 preemption_process = current_running
                 current_running = process
                 event_queue.put((time+cst,(preemption_process.getName(),"EnterQueue")))
-                if current_running.getStatus() == "Running":
-                    preemption_process.startContextSwitchOut(time)
-                    preemption_process.preempt(time+cst)
-                elif current_running.getStatus() == "Context_Switch_In":
-
-                should_finish_time = time + preemption_process.getEstimatedRemaining(time)
-                ignore_list.append((should_finish_time,(preemption_process.getName(),"CSOut")))
+                preemption_process.startContextSwitchOut()
+                preemption_process.preempt()
 
         else:
             print("ERROR: <error-text-here>")
@@ -532,6 +526,26 @@ processes1 = deepcopy(processes)
 processes2 = deepcopy(processes)
 processes3 = deepcopy(processes)
 processes4 = deepcopy(processes)
+print("Simout:")
+FCSF_avg_burst_time = 0
+FCSF_avg_waiting_time = 0
+FCSF_avg_turn_around_time = 0
+FCSF_total_context_switch = 0
+"""
+for i in range(len(processes)):
+    # FCSF
+    FCSF_avg_burst_time += ( processes1[i].getTotalBurstTime() / processes1[i].getTotalBursts() )
+    FCSF_avg_waiting_time += ( processes1[i].getTotalWaitingTime() / processes1[i].getWaitingTimeNum() )
+    FCSF_avg_turn_around_time += ( processes1[i].getTotalTurnaroundTime() / processes1[i].getTurnAroundTimeNum() )
+    FCSF_total_context_switch += processes1[i].context_switch
+"""
 print()
+FCSF_avg_burst_time /= len(processes)
+FCSF_avg_waiting_time /= len(processes)
+FCSF_avg_turn_around_time /= len(processes)
+print(FCSF_avg_burst_time)
+print(FCSF_avg_waiting_time)
+print(FCSF_avg_turn_around_time)
+print(FCSF_total_context_switch)
 SJF(processes2, t_cs/2)
 #SRT(processes3,t_cs/2)

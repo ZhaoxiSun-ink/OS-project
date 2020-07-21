@@ -13,6 +13,7 @@ class Process():
         self.turnaround_times = [] # [(start_time, end_time), (start_time, end_time), ...]
         self.waiting_times = [] # [(start_time, end_time), (start_time, end_time), ...]
         # Status can be: "IO", "Ready", "Running", "Context_Swtich_In" and "Context_Switch_Out"
+        self.context_switch = 0
         self.status = None
         # i-th CPU burst we are now in
         self.index = 0
@@ -40,6 +41,9 @@ class Process():
             ans += burst
         return int(ans)
 
+    def getWaitingTimeNum(self):
+        return len(self.waiting_times)
+
     def getTotalWaitingTime(self):
         ans = 0
         for interval in self.waiting_times:
@@ -47,6 +51,9 @@ class Process():
                 break
             ans += interval[1] - interval[0]
         return ans
+
+    def getTurnAroundTimeNum(self):
+        return len(self.turnaround_times)
 
     def getTotalTurnaroundTime(self):
         ans = 0
