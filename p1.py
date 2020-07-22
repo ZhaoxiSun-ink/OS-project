@@ -244,6 +244,14 @@ def SJF(processes, cst):
 
 
 def SRT(processes,cst):
+    def peek_q(q):
+        try:
+            next_event = q.get(block=False)
+        except:
+            return None
+        q.put(next_event)
+        return next_event
+
     def print_ready_queue(waitq):
         if len(waitq) == 0:
             return "<empty>"
@@ -279,7 +287,7 @@ def SRT(processes,cst):
     print("time 0ms: Simulator started for SRT [Q <empty>]")
 
     while(len(process_table) > 0):
-        if time > 2000: break
+        # if time > 20000: break
         # print("Length: ", event_queue.qsize(), " Time of prev: ", time)
         next_event = event_queue.get(block=False)
         time = int(next_event[0])
@@ -291,8 +299,8 @@ def SRT(processes,cst):
             process.arrive()
             ready_queue.append(process_table[process_name])
             ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
-            #if time <= 1000:
-            print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
+            if time <= 1000:
+                print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
             # Fastest process in the queue
             candidate = ready_queue[0]
             # Nothing running now, just start
@@ -308,13 +316,13 @@ def SRT(processes,cst):
                         current_running.startContextSwitchOut(time)
                         ignore_list.append(current_running)
                         if(current_running.remaining_burst_times[current_running.index] > 0):
-                            event_queue.put((time + cst, 1, current_running.getName(), "EnterQueue"))
-                            #if time <= 1000:
-                            print("0Process will preempt current running process.")
+                            event_queue.put((time + cst, 3, current_running.getName(), "EnterQueue"))
+                            if time <= 1000:
+                                print("0Process will preempt current running process.")
                         else:
                             event_queue.put((time + cst, 1, current_running.getName(), "EnterIO"))
-                            #if time <= 1000:
-                            print("0Process will preempt current running process, IO")
+                            if time <= 1000:
+                                print("0Process will preempt current running process, IO")
                         
                     # if current running is still switching in, do nothing
                     # if current running is switching out, do nothing
@@ -324,8 +332,8 @@ def SRT(processes,cst):
             if len(ready_queue) == 0:
                 expected = process.startRunning(time)
                 event_queue.put((time + expected, 0, process_name, "CSOut"))
-                #if time <= 1000:
-                print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
+                if time <= 1000:
+                    print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
                 continue
             candidate =  ready_queue[0]
             candidate_name = candidate.getName()
@@ -333,18 +341,17 @@ def SRT(processes,cst):
             #print(candidate.getEstimatedBurstTime() , process.getEstimatedBurstTime())
             if candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) < process.getEstimatedBurstTime()-process.alreadyRunTime(time):
                 temp = process.startRunning(time)
-                #if time <= 1000:
-                # TODO
-                print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), temp, print_ready_queue(ready_queue) ))
+                if time <= 1000:
+                    print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), temp, print_ready_queue(ready_queue) ))
                 process.startContextSwitchOut(time)
                 event_queue.put((time + cst, 1, process_name, "EnterQueue"))
-                #if time <= 1000:
-                print("time {}ms: Process {} (tau {}ms) will preempt {} [Q {}]".format(time, candidate.name, candidate.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue)))
+                if time <= 1000:
+                    print("time {}ms: Process {} (tau {}ms) will preempt {} [Q {}]".format(time, candidate.name, candidate.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue)))
             else:
                 expected = process.startRunning(time)
                 event_queue.put((time + expected, 0, process_name, "CSOut"))
-                #if time <= 1000:
-                print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
+                if time <= 1000:
+                    print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), expected, print_ready_queue(ready_queue) ))
 
         elif event_type == "CSOut":
             if process in ignore_list:
@@ -360,20 +367,20 @@ def SRT(processes,cst):
             if process.total_bursts-process.index-1 > 0:
                 CPU_vacant_at = time + cst
                 if process.total_bursts-process.index-1 == 1:
-                    #if time <= 1000:
-                    print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
+                    if time <= 1000:
+                        print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
                 else:
-                    #if time <= 1000:
-                    print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
+                    if time <= 1000:
+                        print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), process.total_bursts-process.index-1, print_ready_queue(ready_queue) ))
                 if process.index < process.total_bursts -1:
                     recalculate_tau(process,process.index) #recaculate_tau
-                    #if time <= 1000:
-                    print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue) ))
+                    if time <= 1000:
+                        print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]".format(time, process.getEstimatedBurstTime(), process.name, print_ready_queue(ready_queue) ))
                     # Sort the ready queue by estimated_burst_time
                     ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
                     # switch out
-                    #if time <= 1000:
-                    print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready_queue(ready_queue) ))
+                    if time <= 1000:
+                        print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]".format(time, process_name, int(time + cst + process.io_times[process.index]), print_ready_queue(ready_queue) ))
                 context_switch_count += 1
                 process.context_switch += 1
 
@@ -387,8 +394,12 @@ def SRT(processes,cst):
             else:
                 event_queue.put((time+expected, 3, process_name, "EnterQueue"))
             current_running = None
-            # immediately add something to the CPU
+            # immediately add something to the CPU, NOOOOOOOOOOOOO!!!! Don't do this!!
             if len(ready_queue) > 0:
+                # See if there are any more enter queue in the same time slot
+                next_event = peek_q(event_queue)
+                if next_event != None and next_event[0] == time and next_event[3] == "EnterQueue":
+                    continue
                 new_name = ready_queue.pop(0).getName()
                 new_process = process_table[new_name]
                 event_queue.put((time+cst, 2, new_name, "Run"))
@@ -403,6 +414,10 @@ def SRT(processes,cst):
                 process.preempt(time)
                 current_running = None
                 # The CPU must be vacant at this point, so push the best candidate to run
+                # See if there are any more enter queue in the same time slot
+                next_event = peek_q(event_queue)
+                if next_event != None and next_event[0] == time and next_event[3] == "EnterQueue":
+                    continue
                 candidate = ready_queue.pop(0)
                 candidate.startContextSwitchIn(time)
                 event_queue.put((time + cst, 2, candidate.getName(), "Run"))
@@ -412,14 +427,18 @@ def SRT(processes,cst):
             if process.getStatus() == "IO":
                 process.finishIO(time)
                 ready_queue.sort(key=operator.attrgetter('estimated_remaining_burst_time', 'name'))
-                #if time <= 1000:
                 # Fastest process in the queue
                 candidate = ready_queue[0]
                 # Nothing running now, just start running the best thing in queue, probably the newly arriving process
                 # print("No current running" if current_running == None else (current_running.getName(), current_running.status))
                 if current_running == None:
-                    print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
-                    .format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
+                    if time <= 1000:
+                        print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+                        .format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
+                    # See if there are any more enter queue in the same time slot
+                    next_event = peek_q(event_queue)
+                    if next_event != None and next_event[0] == time and next_event[3] == "EnterQueue":
+                        continue
                     ready_queue.pop(0)
                     event_queue.put((time + cst, 2, candidate.getName(), "Run"))
                     candidate.startContextSwitchIn(time)
@@ -436,8 +455,9 @@ def SRT(processes,cst):
                         #print(candidate.getEstimatedBurstTime()-candidate.alreadyRunTime(time) , current_running.getEstimatedBurstTime()-current_running.alreadyRunTime(time))
                         # if current running is running, just preempt
                         if current_running.getStatus() == "Running":
-                            print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]"
-                            .format(time, process_name, process.getEstimatedBurstTime(), current_running.getName(), print_ready_queue(ready_queue) ))
+                            if time <= 1000:
+                                print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]"
+                                .format(time, process_name, process.getEstimatedBurstTime(), current_running.getName(), print_ready_queue(ready_queue) ))
                             current_running.startContextSwitchOut(time)
                             ignore_list.append(current_running)
                             # Preempted process enters Queue or IO depending on if it is already finished
@@ -450,11 +470,13 @@ def SRT(processes,cst):
                                 # print("Process will preempt current running process, IO")
                         # if current running is still switching in, just type "we have added process"
                         elif current_running.getStatus() == "Context_Switch_In":
-                            print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
-                            .format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
+                            if time <= 1000:
+                                print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+                                .format(time, process_name, process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
                         # if current running is switching out, do nothing
                     else:
-                        print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+                        if time <= 1000:
+                            print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
                             .format(time, process_name,process.getEstimatedBurstTime(), print_ready_queue(ready_queue) ))
 
         else:
