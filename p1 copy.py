@@ -323,7 +323,7 @@ def SRT(processes,cst):
                             event_queue.put((time + cst, 1, current_running.getName(), "EnterIO"))
                             if time <= 1000:
                                 print("0Process will preempt current running process, IO")
-                        
+
                     # if current running is still switching in, do nothing
                     # if current running is switching out, do nothing
         #run
