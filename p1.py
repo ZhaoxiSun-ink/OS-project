@@ -149,8 +149,8 @@ def SJF(processes, cst):
     Order Numbers: (handling ties)
     0 - CPU burst completion -> CS out
     1 - EnterIO -> Enter I/O
-    2 - Run -> started using the CPU burst
-    3 - EnterQueue -> completed I/O or terminate
+    2 - EnterQueue -> completed I/O or terminate
+    3 - Run -> started using the CPU burst
     4 - Arrive -> arrived
     """
     # push all processes to event_queue
@@ -180,10 +180,10 @@ def SJF(processes, cst):
             print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) != 0 and (current_running == None or time >= CPU_vacant_at):
                 ready_state.pop(0)
-                event_queue.put((time + cst, 2, process_name, "Run"))
+                event_queue.put((time + cst, 3, process_name, "Run"))
                 process.startContextSwitchIn(time)
                 current_running = process_name
-        elif order_num == 2:
+        elif order_num == 3:
             expected = process.startRunning(time)
             event_queue.put((time + expected, 0, process_name, "CSOut"))
             CPU_vacant_at = time + expected + cst
@@ -211,22 +211,25 @@ def SJF(processes, cst):
             context_switch_count += 1
             process.context_switch += 1
         elif order_num == 1:
+            ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
             expected = process.finishRunning(time)
+            print("process name: {} | Enter IO".format(process.name))
             if expected == -1:
                 del process_table[process_name]
             else:
-                event_queue.put((time + expected, 3, process_name, "EnterQueue"))
+                event_queue.put((time + expected, 2, process_name, "EnterQueue"))
             current_running = None
             # Start running another immediately, if there is another one on the waiting queue
             if len(ready_state) > 0:
                 new_process = ready_state.pop(0)
                 new_name = new_process.name
+                print("------ time: {} | poped process name {}".format(time, new_name) )
                 new_process = process_table[new_name]
-                event_queue.put((time + cst, 2, new_name, "Run"))
+                event_queue.put((time + cst, 3, new_name, "Run"))
                 ready_state.sort(key=operator.attrgetter('estimated_burst_time', 'name'))
                 new_process.startContextSwitchIn(time) #problem here
                 current_running = new_name
-        elif order_num == 3:
+        elif order_num == 2:
             process.finishIO(time)
             ready_state.append(process)
             # Sort the ready state by estimated_burst_time
@@ -235,7 +238,7 @@ def SJF(processes, cst):
             print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]".format(time, process_name, process.getEstimatedBurstTime(), print_ready(ready_state) ))
             if len(ready_state) == 1 and current_running == None and time >= CPU_vacant_at:
                 ready_state.pop(0)
-                event_queue.put((time + cst, 2, process_name, "Run"))
+                event_queue.put((time + cst, 3, process_name, "Run"))
                 process.startContextSwitchIn(time)
                 current_running = process_name
         else:
