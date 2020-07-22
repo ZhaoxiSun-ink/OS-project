@@ -172,7 +172,7 @@ def SJF(processes, cst):
             print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {:.0f}ms)".format(process.getName(), process.getArrivalTime(), process.getTotalBursts(), process.getEstimatedBurstTime() ))
     print("time 0ms: Simulator started for SJF [Q <empty>]")
     while( len(process_table) > 0 ):
-        next_event = event_queue.get(block=False)
+        next_event = event_queue.get()
         time = int(next_event[0])
         order_num = next_event[1]
         process_name = next_event[2]
